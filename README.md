@@ -22,13 +22,11 @@
 
 ## Key Highlights
 
-- **98.4% Infrastructure, 1.6% AI** -- The world's most prominent AI coding agent is overwhelmingly deterministic harness, not AI scaffolding.
-- **The Loop Is Simple; Everything Else Is Not** -- The core agent loop is a straightforward while-loop. The 7-mode permission system, 5-layer compaction pipeline, 4 extensibility mechanisms, subagent isolation, and append-only storage are where the complexity lives.
-- **Five Values Drive Every Design Decision** -- Human authority, safety, reliability, capability amplification, and contextual adaptability trace through 13 principles to specific implementation choices.
-- **Defense in Depth Has Shared Failure Modes** -- Seven independent safety layers, but they share token-cost constraints. 50+ subcommands bypass security analysis entirely.
-- **The Pre-Trust Execution Window** -- Five patched CVEs share one root cause: extensions execute *before* the trust dialog appears.
-- **Context Is the Binding Constraint** -- The ~200K-token window drives nearly every architectural decision in the system.
-- **What Resists Reimplementation** -- Comparing with OpenClaw: the loop is easy to copy; the cross-cutting harness (hooks, classifier, compaction, isolation) is not.
+- **98.4% Infrastructure, 1.6% AI** -- The agent loop is a simple while-loop; the real complexity is permission gates, context management, and recovery logic.
+- **5 Values → 13 Principles → Implementation** -- Every design choice traces back to human authority, safety, reliability, capability, and adaptability.
+- **Defense in Depth with Shared Failure Modes** -- 7 safety layers, but all share token-cost constraints. 50+ subcommands bypass security analysis.
+- **5 CVEs from One Root Cause** -- Extensions execute *before* the trust dialog appears.
+- **The Cross-Cutting Harness Resists Reimplementation** -- The loop is easy to copy; hooks, classifier, compaction, and isolation are not.
 
 ---
 
