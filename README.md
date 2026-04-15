@@ -47,8 +47,8 @@
 
 - **98.4% Infrastructure, 1.6% AI** -- The agent loop is a simple while-loop; the real complexity is permission gates, context management, and recovery logic.
 - **5 Values → 13 Principles → Implementation** -- Every design choice traces back to human authority, safety, reliability, capability, and adaptability.
-- **Defense in Depth with Shared Failure Modes** -- 7 safety layers, but all share token-cost constraints. 50+ subcommands bypass security analysis.
-- **5 CVEs from One Root Cause** -- Extensions execute *before* the trust dialog appears.
+- **Defense in Depth with Shared Failure Modes** -- 7 safety layers, but all share performance constraints. 50+ subcommands bypass security analysis.
+- **4 CVEs Reveal a Pre-Trust Window** -- Extensions execute *before* the trust dialog appears.
 - **The Cross-Cutting Harness Resists Reimplementation** -- The loop is easy to copy; hooks, classifier, compaction, and isolation are not.
 
 ---
@@ -76,9 +76,9 @@ Claude Code answers **four design questions** that every production coding agent
 | Where does reasoning live? | Model reasons; harness enforces. ~1.6% AI, 98.4% infrastructure. |
 | How many execution engines? | One `queryLoop` for all interfaces (CLI, SDK, IDE). |
 | Default safety posture? | Deny-first: deny > ask > allow. Strictest rule wins. |
-| Binding resource constraint? | ~200K-token context window. 5 compaction layers before every model call. |
+| Binding resource constraint? | ~200K (older models) / 1M (Claude 4.6 series) context window. 5 compaction layers before every model call. |
 
-The system decomposes into **7 components** (User → Interfaces → Agent Loop → Permission System → Tools → State & Persistence → Execution Environment) across **5 layers** expanding into 21 subsystems.
+The system decomposes into **7 components** (User → Interfaces → Agent Loop → Permission System → Tools → State & Persistence → Execution Environment) across **5 architectural layers**.
 
 <p align="center">
   <img src="./assets/layered_architecture.png" width="100%" alt="5-layer subsystem decomposition">
@@ -100,7 +100,7 @@ The architecture traces from **5 human values** through **13 design principles**
 
 | Value | Core Idea |
 |:------|:----------|
-| **Human Decision Authority** | Humans retain control via principal hierarchy. When 93% approval rate showed fatigue, response was restructured boundaries, not more warnings. |
+| **Human Decision Authority** | Humans retain control via principal hierarchy. When a 93% prompt-approval rate revealed approval fatigue, response was restructured boundaries, not more warnings. |
 | **Safety, Security, Privacy** | System protects even when human vigilance lapses. 7 independent safety layers. |
 | **Reliable Execution** | Does what was meant. Gather-act-verify loop. Graceful recovery. |
 | **Capability Amplification** | "A Unix utility, not a product." 98.4% is deterministic infrastructure enabling the model. |
@@ -127,7 +127,7 @@ The architecture traces from **5 human values** through **13 design principles**
 
 </details>
 
-The paper also applies a **sixth evaluative lens** -- long-term capability preservation -- citing evidence that developers who fully delegate to AI score 17% lower on comprehension tests.
+The paper also applies a **sixth evaluative lens** -- long-term capability preservation -- citing evidence that developers in AI-assisted conditions score 17% lower on comprehension tests.
 
 <p align="right"><a href="#dive-into-claude-code-the-design-space-of-todays-ai-agent-system">↑ Back to top</a></p>
 
@@ -174,7 +174,7 @@ The core is a **ReAct-pattern while-loop**: assemble context → call model → 
 **Deny-first**: A broad deny *always* overrides a narrow allow. **7 independent safety layers** from tool pre-filtering through shell sandboxing to hook interception. Permissions are **never restored on resume** -- trust is re-established per session.
 
 > [!WARNING]
-> **Shared failure modes:** Defense-in-depth degrades when layers share constraints. All safety layers share token economics -- commands exceeding 50 subcommands bypass security analysis entirely due to token cost.
+> **Shared failure modes:** Defense-in-depth degrades when layers share constraints. Per-subcommand parsing causes event-loop starvation -- commands exceeding 50 subcommands bypass security analysis entirely to prevent the REPL from freezing.
 
 <details>
 <summary><b>More details: authorization pipeline, auto-mode classifier, CVEs</b></summary>
@@ -183,7 +183,7 @@ The core is a **ReAct-pattern while-loop**: assemble context → call model → 
 
 **Auto-mode classifier** (`yoloClassifier.ts`): Separate LLM call with internal/external permission templates. Two-stage: fast-filter + chain-of-thought.
 
-**Pre-trust execution window:** 5 patched CVEs share root cause -- hooks and MCP servers execute during initialization *before* the trust dialog appears, creating a structurally privileged attack window outside the deny-first pipeline.
+**Pre-trust execution window:** 2 patched CVEs share this root cause -- hooks and MCP servers execute during initialization *before* the trust dialog appears, creating a structurally privileged attack window outside the deny-first pipeline.
 
 </details>
 
@@ -244,7 +244,7 @@ The core is a **ReAct-pattern while-loop**: assemble context → call model → 
   <img src="./assets/subagent.png" width="75%" alt="Subagent architecture">
 </p>
 
-**6 built-in types** (Explore, Plan, General-purpose, Guide, Verification, Statusline) + custom agents via `.claude/agents/*.md`. **Sidechain transcripts**: only summaries return to parent (~7x token cost). Three isolation modes: worktree, remote, in-process. Coordination via POSIX `flock()`.
+**6 built-in types** (Explore, Plan, General-purpose, Guide, Verification, Statusline) + custom agents via `.claude/agents/*.md`. **Sidechain transcripts**: only summaries return to parent (parent's context is *protected* from subagent verbosity). Three isolation modes: worktree, remote, in-process. Coordination via POSIX `flock()`.
 
 **SkillTool vs AgentTool:** SkillTool injects into current context (cheap). AgentTool spawns isolated context (expensive, but prevents context explosion).
 
@@ -281,7 +281,7 @@ Three channels: append-only JSONL transcripts, global prompt history, subagent s
 
 > Not a coding tutorial. A guide to the **design decisions** you must make, derived from architectural analysis.
 
-Every production agent must navigate these six decisions:
+Every production agent must navigate these decisions:
 
 | Decision | The Question | Key Insight |
 |:---------|:-------------|:------------|
@@ -289,7 +289,7 @@ Every production agent must navigate these six decisions:
 | [**Safety posture**](./docs/build-your-own-agent.md#decision-2-what-is-your-safety-posture) | How do you prevent harmful actions? | Defense-in-depth fails when layers share failure modes. |
 | [**Context management**](./docs/build-your-own-agent.md#decision-3-how-do-you-manage-context) | What does the model see? | Design for context scarcity from day one. Graduated > single-pass. |
 | [**Extensibility**](./docs/build-your-own-agent.md#decision-4-how-do-you-handle-extensibility) | How do extensions plug in? | Not all extensions need to consume context tokens. |
-| [**Subagent architecture**](./docs/build-your-own-agent.md#decision-5-how-do-subagents-work) | Shared or isolated context? | Subagent sessions cost ~7x tokens. Summary-only returns are essential. |
+| [**Subagent architecture**](./docs/build-your-own-agent.md#decision-5-how-do-subagents-work) | Shared or isolated context? | Agent teams in plan mode cost ~7× tokens. Subagent summary-only returns prevent context blow-up. |
 | [**Session persistence**](./docs/build-your-own-agent.md#decision-6-how-do-sessions-persist) | What carries over? | Never restore permissions on resume. Auditability > query power. |
 
 **Read the full guide: [docs/build-your-own-agent.md](./docs/build-your-own-agent.md)**
@@ -311,7 +311,7 @@ Deep dives into Claude Code's internal design.
 | [**ComeOnOliver/claude-code-analysis**](https://github.com/ComeOnOliver/claude-code-analysis) | Comprehensive reverse-engineering: source tree structure, module boundaries, tool inventories, and architectural patterns. |
 | [**alejandrobalderas/claude-code-from-source**](https://github.com/alejandrobalderas/claude-code-from-source) | 18-chapter technical book (~400 pages). All original pseudocode, no proprietary source. |
 | [**liuup/claude-code-analysis**](https://github.com/liuup/claude-code-analysis) | Chinese-language deep-dive — startup flow, query main loop, MCP integration, multi-agent architecture. |
-| [**sanbuphy/claude-code-source-code**](https://github.com/sanbuphy/claude-code-source-code) | Quadrilingual analysis (EN/JA/KO/ZH) — 10 domains, 75 reports. Covers telemetry, codenames, KAIROS, unreleased tools. |
+| [**sanbuphy/claude-code-source-code**](https://github.com/sanbuphy/claude-code-source-code) | Quadrilingual analysis (EN/JA/KO/ZH) — multi-domain reports covering telemetry, codenames, KAIROS, unreleased tools. |
 | [**cablate/claude-code-research**](https://github.com/cablate/claude-code-research) | Independent research on internals, Agent SDK, and related tooling. |
 | [**Yuyz0112/claude-code-reverse**](https://github.com/Yuyz0112/claude-code-reverse) | Visualize Claude Code's LLM interactions — log parser and visual tool to trace prompts, tool calls, and compaction. |
 
@@ -321,8 +321,8 @@ Clean-room rewrites and buildable research forks.
 
 | Repository | Description |
 |:-----------|:------------|
-| [**chauncygu/collection-claude-code-source-code**](https://github.com/chauncygu/collection-claude-code-source-code) | Meta-collection — claw-code (Rust, 30K+ stars), nano-claude-code (Python ~5K lines), and original source archive. |
-| [**777genius/claude-code-working**](https://github.com/777genius/claude-code-working) | Working reverse-engineered CLI. Runnable with Bun, 450+ chunk files, 30 feature flags polyfilled. |
+| [**chauncygu/collection-claude-code-source-code**](https://github.com/chauncygu/collection-claude-code-source-code) | Meta-collection of community Claude Code source artifacts -- includes claw-code (Rust port), nano-claude-code (Python), and the extracted original source archive. |
+| [**777genius/claude-code-working**](https://github.com/777genius/claude-code-working) | Working reverse-engineered CLI. Runnable with Bun, 450+ chunk files, 31 feature flags polyfilled. |
 | [**T-Lab-CUHKSZ/claude-code**](https://github.com/T-Lab-CUHKSZ/claude-code) | CUHK-Shenzhen buildable research fork — reconstructed build system from raw TypeScript snapshot. |
 | [**ruvnet/open-claude-code**](https://github.com/ruvnet/open-claude-code) | Nightly auto-decompile rebuild — 903+ tests, 25 tools, 4 MCP transports, 6 permission modes. |
 | [**Enderfga/openclaw-claude-code**](https://github.com/Enderfga/openclaw-claude-code) | OpenClaw plugin — unified ISession interface for Claude/Codex/Gemini/Cursor. Multi-agent council. |
@@ -347,7 +347,7 @@ Tutorials and hands-on learning paths.
 | [Haseeb Qureshi — Cross-agent architecture comparison](https://gist.github.com/Haseeb-Qureshi/2213cc0487ea71d62572a645d7582518) | Claude Code vs Codex vs Cline vs OpenCode — architecture-level comparison. |
 | [George Sung — "Tracing Claude Code's LLM Traffic"](https://medium.com/@georgesung/tracing-claude-codes-llm-traffic-agentic-loop-sub-agents-tool-use-prompts-7796941806f5) | Complete system prompts and full API logs. Discovered dual-model usage (Opus + Haiku). |
 | [Agiflow — "Reverse Engineering Prompt Augmentation"](https://agiflow.io/blog/claude-code-internals-reverse-engineering-prompt-augmentation/) | 5 prompt augmentation mechanisms backed by actual network traces. |
-| [Engineer's Codex — "Diving into the Source Code Leak"](https://read.engineerscodex.com/p/diving-into-claude-codes-source-code) | Modular system prompt, ~40 tools, 46K-line query engine, anti-distillation. |
+| [Engineer's Codex — "Diving into the Source Code Leak"](https://read.engineerscodex.com/p/diving-into-claude-codes-source-code) | Modular system prompt, ~40 tools, large query/tool subsystem, anti-distillation. |
 | [MindStudio — "Three-Layer Memory Architecture"](https://www.mindstudio.ai/blog/claude-code-source-leak-memory-architecture) | In-context memory, MEMORY.md pointer index, CLAUDE.md static config. Best single resource on memory. |
 
 ### Related Academic Papers
