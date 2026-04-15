@@ -5,6 +5,7 @@
 </p>
 
 <p align="center">
+  <a href="./paper/Dive_into_Claude_Code.pdf"><img src="https://img.shields.io/badge/Paper-PDF-blue.svg?logo=adobeacrobatreader&logoColor=white" alt="Paper"></a>
   <a href="https://arxiv.org/abs/XXXX.XXXXX"><img src="https://img.shields.io/badge/arXiv-XXXX.XXXXX-b31b1b.svg" alt="arXiv"></a>
   <a href="./LICENSE"><img src="https://img.shields.io/badge/License-CC--BY--NC--SA--4.0-lightgrey.svg" alt="License"></a>
   <a href="https://github.com/VILA-Lab/Dive-into-ClaudeCode/stargazers"><img src="https://img.shields.io/github/stars/VILA-Lab/Dive-into-ClaudeCode?style=social" alt="Stars"></a>
@@ -241,7 +242,7 @@ The core is a **ReAct-pattern while-loop**: assemble context → call model → 
 <summary><h2>Subagent Delegation</h2></summary>
 
 <p align="center">
-  <img src="./assets/subagent.png" width="75%" alt="Subagent architecture">
+  <img src="./assets/subagent.png" width="90%" alt="Subagent architecture">
 </p>
 
 **6 built-in types** (Explore, Plan, General-purpose, Guide, Verification, Statusline) + custom agents via `.claude/agents/*.md`. **Sidechain transcripts**: only summaries return to parent (parent's context is *protected* from subagent verbosity). Three isolation modes: worktree, remote, in-process. Coordination via POSIX `flock()`.
