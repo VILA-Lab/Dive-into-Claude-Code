@@ -13,8 +13,6 @@
 
 > **A comprehensive source-level architectural analysis of Claude Code (v2.1.88, ~1,900 TypeScript files, ~512K lines of code), combined with a curated collection of community analyses, a design-space guide for agent builders, and cross-system comparisons.**
 
-**Authors:** [**Jiacheng Liu**](https://scholar.google.com/citations?hl=en&user=_awln6YAAAAJ), [**Xiaohan Zhao**](https://scholar.google.com/citations?user=PliLuD4AAAAJ&hl=en), [**Xinyi Shang**](https://scholar.google.com/citations?hl=zh-CN&user=pkfBYHAAAAAJ), [**Zhiqiang Shen**](https://zhiqiangshen.com/)<sup>†</sup>
-
 > [!TIP]
 > **TL;DR** -- Only 1.6% of Claude Code's codebase is AI decision logic. The other 98.4% is deterministic infrastructure -- permission gates, context management, tool routing, and recovery logic. The agent loop is a simple while-loop; the real engineering complexity lives in the systems around it. This repo dissects that architecture and distills it into actionable design guidance for anyone building AI agent systems.
 
