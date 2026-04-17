@@ -8,7 +8,7 @@
   <a href="./paper/Dive_into_Claude_Code.pdf"><img src="https://img.shields.io/badge/Paper-PDF-blue.svg?logo=adobeacrobatreader&logoColor=white" alt="Paper"></a>
   <a href="https://arxiv.org/abs/2604.14228"><img src="https://img.shields.io/badge/arXiv-2604.14228-b31b1b.svg" alt="arXiv"></a>
   <a href="./LICENSE"><img src="https://img.shields.io/badge/License-CC--BY--NC--SA--4.0-lightgrey.svg" alt="License"></a>
-  <a href="https://github.com/VILA-Lab/Dive-into-ClaudeCode/stargazers"><img src="https://img.shields.io/github/stars/VILA-Lab/Dive-into-ClaudeCode?style=social" alt="Stars"></a>
+  <a href="https://github.com/VILA-Lab/Dive-into-Claude-Code/stargazers"><img src="https://img.shields.io/github/stars/VILA-Lab/Dive-into-Claude-Code?style=social" alt="Stars"></a>
 </p>
 
 > **A comprehensive source-level architectural analysis of Claude Code (v2.1.88, ~1,900 TypeScript files, ~512K lines of code), combined with a curated collection of community analyses, a design-space guide for agent builders, and cross-system comparisons.**
@@ -415,8 +415,8 @@ Recently launched (2025–2026) open-source AI agent projects outside the Claude
 
 ---
 <p align="center">
-  <a href="https://star-history.com/#VILA-Lab/Dive-into-ClaudeCode&Date">
-    <img src="https://api.star-history.com/svg?repos=VILA-Lab/Dive-into-ClaudeCode&type=Date" width="90%" alt="Star History Chart">
+  <a href="https://star-history.com/#VILA-Lab/Dive-into-Claude-Code&Date">
+    <img src="https://api.star-history.com/svg?repos=VILA-Lab/Dive-into-Claude-Code&type=Date" width="90%" alt="Star History Chart">
   </a>
 </p>
 
