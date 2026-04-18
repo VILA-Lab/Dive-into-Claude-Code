@@ -9,5 +9,5 @@ jobs:
   purge:
     runs-on: ubuntu-latest
     steps:
-      - name: Purge camo image cache
-        run: npx --yes camo-purge --repository=VILA-Lab/Dive-into-Claude-Code
+      - uses: actions/checkout@v4
+      - uses: kevincobain2000/action-camo-purge@v1
