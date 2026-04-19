@@ -414,11 +414,9 @@ Recently launched (2025–2026) open-source AI agent projects outside the Claude
 <p align="right"><a href="#dive-into-claude-code-the-design-space-of-todays-ai-agent-system">↑ Back to top</a></p>
 
 ---
-<p align="center">
-  <a href="https://star-history.com/#VILA-Lab/Dive-into-Claude-Code&Date">
-    <img src="https://api.star-history.com/svg?repos=VILA-Lab/Dive-into-Claude-Code&type=Date" width="90%" alt="Star History Chart">
-  </a>
-</p>
+## Star History
+
+[![Star History Chart](https://api.star-history.com/chart?repos=VILA-Lab/Dive-into-Claude-Code&type=date&legend=top-left)](https://www.star-history.com/?type=date&repos=VILA-Lab%2FDive-into-Claude-Code)
 
 ## Citation
 
