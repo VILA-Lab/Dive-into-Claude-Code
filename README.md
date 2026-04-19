@@ -416,7 +416,7 @@ Recently launched (2025–2026) open-source AI agent projects outside the Claude
 ---
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/chart?repos=VILA-Lab/Dive-into-Claude-Code&type=date&legend=top-left)](https://www.star-history.com/?type=date&repos=VILA-Lab%2FDive-into-Claude-Code)
+[![Star History Chart](https://api.star-history.com/svg?repos=VILA-Lab/Dive-into-Claude-Code&type=Date)](https://www.star-history.com/#VILA-Lab/Dive-into-Claude-Code&Date)
 
 ## Citation
 
