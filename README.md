@@ -412,6 +412,9 @@ Recently launched (2025–2026) open-source AI agent projects outside the Claude
 | [**multica-ai/multica**](https://github.com/multica-ai/multica) | 2026 | Managed-agents platform for task assignment and skill compounding. |
 | [**badlogic/pi-mono**](https://github.com/badlogic/pi-mono) | Aug 2025 | Monorepo coding-agent toolkit — unified LLM API (OpenAI/Anthropic/Google), TUI + web UI, per-cwd session persistence. |
 | [**coleam00/Archon**](https://github.com/coleam00/Archon) | Feb 2025 | Deterministic harness — YAML-defined workflows with execution audit trail; contrast to model-driven agent loops. |
+| [**HKUDS/nanobot**](https://github.com/HKUDS/nanobot) | Feb 2026 | Ultra-lightweight personal AI agent from HKU-DS; minimalist design contrast to heavyweight harnesses. |
+| [**HKUDS/OpenHarness**](https://github.com/HKUDS/OpenHarness) | Apr 2026 | Open agent harness with built-in personal agent (Ohmo); academic reference point on harness architecture. |
+| [**openai/symphony**](https://github.com/openai/symphony) | Feb 2026 | OpenAI's orchestration for isolated, autonomous implementation runs — parallel-session design axis. |
 
 <p align="right"><a href="#dive-into-claude-code-the-design-space-of-todays-ai-agent-system">↑ Back to top</a></p>
 
