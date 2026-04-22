@@ -11,6 +11,10 @@
   <a href="https://github.com/VILA-Lab/Dive-into-Claude-Code/stargazers"><img src="https://img.shields.io/github/stars/VILA-Lab/Dive-into-Claude-Code?style=social" alt="星标数"></a>
 </p>
 
+<p align="center">
+  <a href="./README.md">English</a> | <b>中文</b>
+</p>
+
 > **一份面向 Claude Code（v2.1.88，约 1,900 个 TypeScript 文件、约 512K 行代码）的全面源码级架构分析，附带社区分析精选、面向智能体开发者的设计空间指南，以及跨系统对比。**
 
 > [!TIP]

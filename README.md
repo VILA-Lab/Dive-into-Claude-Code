@@ -11,6 +11,10 @@
   <a href="https://github.com/VILA-Lab/Dive-into-Claude-Code/stargazers"><img src="https://img.shields.io/github/stars/VILA-Lab/Dive-into-Claude-Code?style=social" alt="Stars"></a>
 </p>
 
+<p align="center">
+  <b>English</b> | <a href="./README_zh.md">中文</a>
+</p>
+
 > **A comprehensive source-level architectural analysis of Claude Code (v2.1.88, ~1,900 TypeScript files, ~512K lines of code), combined with a curated collection of community analyses, a design-space guide for agent builders, and cross-system comparisons.**
 
 > [!TIP]
