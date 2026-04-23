@@ -35,6 +35,7 @@ Clean-room rewrites and buildable research forks.
 | [**ruvnet/open-claude-code**](https://github.com/ruvnet/open-claude-code) | Nightly auto-decompile rebuild — 903+ tests, 25 tools, 4 MCP transports, 6 permission modes. |
 | [**Enderfga/openclaw-claude-code**](https://github.com/Enderfga/openclaw-claude-code) | OpenClaw plugin — unified ISession interface for Claude/Codex/Gemini/Cursor. Multi-agent council. |
 | [**memaxo/claude_code_re**](https://github.com/memaxo/claude_code_re) | Reverse engineering from minified bundles — deobfuscation of the publicly distributed cli.js file. |
+| [**agentforce314/clawcodex**](https://github.com/agentforce314/clawcodex) | Python rebuild with multi-provider LLM support. |
 
 ---
 

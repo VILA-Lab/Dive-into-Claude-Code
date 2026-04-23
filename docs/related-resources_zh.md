@@ -35,6 +35,7 @@
 | [**ruvnet/open-claude-code**](https://github.com/ruvnet/open-claude-code) | 夜间自动反编译重建——903+ 测试、25 个工具、4 种 MCP 传输、6 个权限模式。 |
 | [**Enderfga/openclaw-claude-code**](https://github.com/Enderfga/openclaw-claude-code) | OpenClaw 插件——为 Claude/Codex/Gemini/Cursor 提供统一的 ISession 接口。多智能体委员会。 |
 | [**memaxo/claude_code_re**](https://github.com/memaxo/claude_code_re) | 从压缩后的包进行逆向工程——对公开分发的 cli.js 文件进行反混淆。 |
+| [**agentforce314/clawcodex**](https://github.com/agentforce314/clawcodex) | Python 重新实现，支持多家 LLM 厂商。 |
 
 ---
 
