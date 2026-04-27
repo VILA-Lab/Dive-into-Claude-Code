@@ -420,6 +420,11 @@ Claude Code 回答了每个生产级编码智能体都必须面对的**四个设
 | [**HKUDS/nanobot**](https://github.com/HKUDS/nanobot) | 2026 年 2 月 | 来自 HKU-DS 的超轻量级个人 AI 智能体；与重型 harness 的简约设计对比。 |
 | [**HKUDS/OpenHarness**](https://github.com/HKUDS/OpenHarness) | 2026 年 4 月 | 带有内置个人智能体（Ohmo）的开放智能体 harness；harness 架构的学术参考点。 |
 | [**openai/symphony**](https://github.com/openai/symphony) | 2026 年 2 月 | OpenAI 的编排方案，用于隔离、自主的实现运行——对应并行会话这一设计维度。 |
+| [**karpathy/autoresearch**](https://github.com/karpathy/autoresearch) | 2026 年 3 月 | Andrej Karpathy 出品：在单 GPU 上自动运行 nanochat 训练研究的 AI 智能体循环。 |
+| [**HKUDS/CLI-Anything**](https://github.com/HKUDS/CLI-Anything) | 2026 年 3 月 | "Making ALL Software Agent-Native"——把任意软件包装成智能体可调用工具的统一 CLI 接入层。 |
+| [**Panniantong/Agent-Reach**](https://github.com/Panniantong/Agent-Reach) | 2026 年 2 月 | 一个 CLI 让智能体免费读写 Twitter、Reddit、YouTube、GitHub、Bilibili、小红书；自带 MCP 和 Claude Code / Cursor 集成。 |
+| [**agentscope-ai/QwenPaw**](https://github.com/agentscope-ai/QwenPaw) | 2026 年 2 月 | AgentScope 团队的个人 AI 助手——本地或云端部署，支持多聊天 app，能力可扩展。 |
+| [**cft0808/edict**](https://github.com/cft0808/edict) | 2026 年 2 月 | "三省六部制"——基于 OpenClaw 的多智能体编排系统，9 个专门智能体 + 实时 dashboard + 模型配置 + 完整审计追踪。 |
 
 <p align="right"><a href="#深入理解-claude-code">↑ 返回顶部</a></p>
 

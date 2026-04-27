@@ -420,6 +420,11 @@ Recently launched (2025–2026) open-source AI agent projects outside the Claude
 | [**HKUDS/nanobot**](https://github.com/HKUDS/nanobot) | Feb 2026 | Ultra-lightweight personal AI agent from HKU-DS; minimalist design contrast to heavyweight harnesses. |
 | [**HKUDS/OpenHarness**](https://github.com/HKUDS/OpenHarness) | Apr 2026 | Open agent harness with built-in personal agent (Ohmo); academic reference point on harness architecture. |
 | [**openai/symphony**](https://github.com/openai/symphony) | Feb 2026 | OpenAI's orchestration for isolated, autonomous implementation runs — parallel-session design axis. |
+| [**karpathy/autoresearch**](https://github.com/karpathy/autoresearch) | Mar 2026 | Andrej Karpathy's autonomous AI-agent loop that runs nanochat training research on a single GPU. |
+| [**HKUDS/CLI-Anything**](https://github.com/HKUDS/CLI-Anything) | Mar 2026 | "Making ALL Software Agent-Native" — unified CLI surface that wraps arbitrary software as agent-callable tools. |
+| [**Panniantong/Agent-Reach**](https://github.com/Panniantong/Agent-Reach) | Feb 2026 | One CLI giving agents read/search access to Twitter, Reddit, YouTube, GitHub, Bilibili, and Xiaohongshu without paid APIs; ships with MCP and Claude Code / Cursor integration. |
+| [**agentscope-ai/QwenPaw**](https://github.com/agentscope-ai/QwenPaw) | Feb 2026 | Personal AI assistant from the AgentScope team — self-hosted or cloud, multi-chat-app support, and extensible capabilities. |
+| [**cft0808/edict**](https://github.com/cft0808/edict) | Feb 2026 | "三省六部制" — OpenClaw-based multi-agent orchestration with 9 specialized agents, real-time dashboard, model config, and full audit trails. |
 
 <p align="right"><a href="#dive-into-claude-code-the-design-space-of-todays-ai-agent-system">↑ Back to top</a></p>
 
