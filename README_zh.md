@@ -338,12 +338,12 @@ Claude Code 回答了每个生产级编码智能体都必须面对的**四个设
 
 | 仓库 | 描述 |
 |:-----------|:------------|
-| [**ComeOnOliver/claude-code-analysis**](https://github.com/ComeOnOliver/claude-code-analysis) | 全面的逆向工程：源码树结构、模块边界、工具清单和架构模式。 |
-| [**alejandrobalderas/claude-code-from-source**](https://github.com/alejandrobalderas/claude-code-from-source) | 18 章技术书（约 400 页）。全部原创伪代码，无专有源代码。 |
-| [**liuup/claude-code-analysis**](https://github.com/liuup/claude-code-analysis) | 中文深度剖析——启动流程、查询主循环、MCP 集成、多智能体架构。 |
-| [**sanbuphy/claude-code-source-code**](https://github.com/sanbuphy/claude-code-source-code) | 四语（EN/JA/KO/ZH）分析——多领域报告，涵盖遥测、代号、KAIROS、未发布的工具。 |
-| [**cablate/claude-code-research**](https://github.com/cablate/claude-code-research) | 关于内部结构、Agent SDK 和相关工具的独立研究。 |
-| [**Yuyz0112/claude-code-reverse**](https://github.com/Yuyz0112/claude-code-reverse) | 可视化 Claude Code 的 LLM 交互——日志解析器和可视化工具，追踪提示、工具调用和压缩。 |
+| [**ComeOnOliver/claude-code-analysis**](https://github.com/ComeOnOliver/claude-code-analysis) [![Star](https://img.shields.io/github/stars/ComeOnOliver/claude-code-analysis.svg?style=social&label=Star)](https://github.com/ComeOnOliver/claude-code-analysis) | 全面的逆向工程：源码树结构、模块边界、工具清单和架构模式。 |
+| [**alejandrobalderas/claude-code-from-source**](https://github.com/alejandrobalderas/claude-code-from-source) [![Star](https://img.shields.io/github/stars/alejandrobalderas/claude-code-from-source.svg?style=social&label=Star)](https://github.com/alejandrobalderas/claude-code-from-source) | 18 章技术书（约 400 页）。全部原创伪代码，无专有源代码。 |
+| [**liuup/claude-code-analysis**](https://github.com/liuup/claude-code-analysis) [![Star](https://img.shields.io/github/stars/liuup/claude-code-analysis.svg?style=social&label=Star)](https://github.com/liuup/claude-code-analysis) | 中文深度剖析——启动流程、查询主循环、MCP 集成、多智能体架构。 |
+| [**sanbuphy/claude-code-source-code**](https://github.com/sanbuphy/claude-code-source-code) [![Star](https://img.shields.io/github/stars/sanbuphy/claude-code-source-code.svg?style=social&label=Star)](https://github.com/sanbuphy/claude-code-source-code) | 四语（EN/JA/KO/ZH）分析——多领域报告，涵盖遥测、代号、KAIROS、未发布的工具。 |
+| [**cablate/claude-code-research**](https://github.com/cablate/claude-code-research) [![Star](https://img.shields.io/github/stars/cablate/claude-code-research.svg?style=social&label=Star)](https://github.com/cablate/claude-code-research) | 关于内部结构、Agent SDK 和相关工具的独立研究。 |
+| [**Yuyz0112/claude-code-reverse**](https://github.com/Yuyz0112/claude-code-reverse) [![Star](https://img.shields.io/github/stars/Yuyz0112/claude-code-reverse.svg?style=social&label=Star)](https://github.com/Yuyz0112/claude-code-reverse) | 可视化 Claude Code 的 LLM 交互——日志解析器和可视化工具，追踪提示、工具调用和压缩。 |
 
 ### 开源重新实现
 
@@ -351,13 +351,13 @@ Claude Code 回答了每个生产级编码智能体都必须面对的**四个设
 
 | 仓库 | 描述 |
 |:-----------|:------------|
-| [**chauncygu/collection-claude-code-source-code**](https://github.com/chauncygu/collection-claude-code-source-code) | 社区 Claude Code 源码产物的聚合集——包括 claw-code（Rust 移植）、nano-claude-code（Python）和提取的原始源码存档。 |
-| [**777genius/claude-code-working**](https://github.com/777genius/claude-code-working) | 可运行的逆向工程 CLI。使用 Bun 运行，450+ 个 chunk 文件，polyfill 了 31 个特性标志。 |
-| [**T-Lab-CUHKSZ/claude-code**](https://github.com/T-Lab-CUHKSZ/claude-code) | 香港中文大学（深圳）的可构建研究分支——从原始 TypeScript 快照重建构建系统。 |
-| [**ruvnet/open-claude-code**](https://github.com/ruvnet/open-claude-code) | 夜间自动反编译重建——903+ 测试、25 个工具、4 种 MCP 传输、6 个权限模式。 |
-| [**Enderfga/openclaw-claude-code**](https://github.com/Enderfga/openclaw-claude-code) | OpenClaw 插件——为 Claude/Codex/Gemini/Cursor 提供统一的 ISession 接口。多智能体委员会。 |
-| [**memaxo/claude_code_re**](https://github.com/memaxo/claude_code_re) | 从压缩后的包进行逆向工程——对公开分发的 cli.js 文件进行反混淆。 |
-| [**agentforce314/clawcodex**](https://github.com/agentforce314/clawcodex) | Python 重新实现，支持多家 LLM 厂商。 |
+| [**chauncygu/collection-claude-code-source-code**](https://github.com/chauncygu/collection-claude-code-source-code) [![Star](https://img.shields.io/github/stars/chauncygu/collection-claude-code-source-code.svg?style=social&label=Star)](https://github.com/chauncygu/collection-claude-code-source-code) | 社区 Claude Code 源码产物的聚合集——包括 claw-code（Rust 移植）、nano-claude-code（Python）和提取的原始源码存档。 |
+| [**777genius/claude-code-working**](https://github.com/777genius/claude-code-working) [![Star](https://img.shields.io/github/stars/777genius/claude-code-working.svg?style=social&label=Star)](https://github.com/777genius/claude-code-working) | 可运行的逆向工程 CLI。使用 Bun 运行，450+ 个 chunk 文件，polyfill 了 31 个特性标志。 |
+| [**T-Lab-CUHKSZ/claude-code**](https://github.com/T-Lab-CUHKSZ/claude-code) [![Star](https://img.shields.io/github/stars/T-Lab-CUHKSZ/claude-code.svg?style=social&label=Star)](https://github.com/T-Lab-CUHKSZ/claude-code) | 香港中文大学（深圳）的可构建研究分支——从原始 TypeScript 快照重建构建系统。 |
+| [**ruvnet/open-claude-code**](https://github.com/ruvnet/open-claude-code) [![Star](https://img.shields.io/github/stars/ruvnet/open-claude-code.svg?style=social&label=Star)](https://github.com/ruvnet/open-claude-code) | 夜间自动反编译重建——903+ 测试、25 个工具、4 种 MCP 传输、6 个权限模式。 |
+| [**Enderfga/openclaw-claude-code**](https://github.com/Enderfga/openclaw-claude-code) [![Star](https://img.shields.io/github/stars/Enderfga/openclaw-claude-code.svg?style=social&label=Star)](https://github.com/Enderfga/openclaw-claude-code) | OpenClaw 插件——为 Claude/Codex/Gemini/Cursor 提供统一的 ISession 接口。多智能体委员会。 |
+| [**memaxo/claude_code_re**](https://github.com/memaxo/claude_code_re) [![Star](https://img.shields.io/github/stars/memaxo/claude_code_re.svg?style=social&label=Star)](https://github.com/memaxo/claude_code_re) | 从压缩后的包进行逆向工程——对公开分发的 cli.js 文件进行反混淆。 |
+| [**agentforce314/clawcodex**](https://github.com/agentforce314/clawcodex) [![Star](https://img.shields.io/github/stars/agentforce314/clawcodex.svg?style=social&label=Star)](https://github.com/agentforce314/clawcodex) | Python 重新实现，支持多家 LLM 厂商。 |
 
 ### 指南与学习
 
@@ -365,9 +365,9 @@ Claude Code 回答了每个生产级编码智能体都必须面对的**四个设
 
 | 仓库 | 描述 |
 |:-----------|:------------|
-| [**shareAI-lab/learn-claude-code**](https://github.com/shareAI-lab/learn-claude-code) | "Bash 就是你需要的一切"——19 章 0 到 1 课程，包含可运行的 Python 智能体、Web 平台。ZH/EN/JA。 |
-| [**FlorianBruniaux/claude-code-ultimate-guide**](https://github.com/FlorianBruniaux/claude-code-ultimate-guide) | 从初学者到高级用户的指南，包含生产级模板、智能体工作流指南和速查表。 |
-| [**affaan-m/everything-claude-code**](https://github.com/affaan-m/everything-claude-code) | 智能体 harness 优化——skills、本能、记忆、安全和研究优先开发。50K+ 星标。 |
+| [**shareAI-lab/learn-claude-code**](https://github.com/shareAI-lab/learn-claude-code) [![Star](https://img.shields.io/github/stars/shareAI-lab/learn-claude-code.svg?style=social&label=Star)](https://github.com/shareAI-lab/learn-claude-code) | "Bash 就是你需要的一切"——19 章 0 到 1 课程，包含可运行的 Python 智能体、Web 平台。ZH/EN/JA。 |
+| [**FlorianBruniaux/claude-code-ultimate-guide**](https://github.com/FlorianBruniaux/claude-code-ultimate-guide) [![Star](https://img.shields.io/github/stars/FlorianBruniaux/claude-code-ultimate-guide.svg?style=social&label=Star)](https://github.com/FlorianBruniaux/claude-code-ultimate-guide) | 从初学者到高级用户的指南，包含生产级模板、智能体工作流指南和速查表。 |
+| [**affaan-m/everything-claude-code**](https://github.com/affaan-m/everything-claude-code) [![Star](https://img.shields.io/github/stars/affaan-m/everything-claude-code.svg?style=social&label=Star)](https://github.com/affaan-m/everything-claude-code) | 智能体 harness 优化——skills、本能、记忆、安全和研究优先开发。 |
 
 ### 博客文章与技术文章
 
@@ -409,22 +409,22 @@ Claude Code 回答了每个生产级编码智能体都必须面对的**四个设
 
 | 仓库 | 推出时间 | 重点 |
 |:-----------|:-------|:------|
-| [**openclaw/openclaw**](https://github.com/openclaw/openclaw) | 2026 年 1 月 | 跨消息平台的本地优先个人 AI 助手。 |
-| [**sst/opencode**](https://github.com/sst/opencode) | 2025 年 6 月 | 与模型厂商无关的终端编码智能体。 |
-| [**NousResearch/hermes-agent**](https://github.com/nousresearch/hermes-agent) | 2026 年 2 月 | 具有跨会话记忆的自我改进个人智能体。 |
-| [**666ghj/MiroFish**](https://github.com/666ghj/MiroFish) | 2026 年 3 月 | 多智能体群体智能模拟引擎。 |
-| [**MemPalace/mempalace**](https://github.com/MemPalace/mempalace) | 2026 年 | AI 智能体的本地优先记忆系统。 |
-| [**multica-ai/multica**](https://github.com/multica-ai/multica) | 2026 年 | 用于任务分配和技能复合的托管智能体平台。 |
-| [**badlogic/pi-mono**](https://github.com/badlogic/pi-mono) | 2025 年 8 月 | monorepo 编码智能体工具包——统一 LLM API（OpenAI/Anthropic/Google）、TUI + web UI、per-cwd 会话持久化。 |
-| [**coleam00/Archon**](https://github.com/coleam00/Archon) | 2025 年 2 月 | 确定性 harness——YAML 定义的工作流与执行审计跟踪；与模型驱动的智能体循环对比。 |
-| [**HKUDS/nanobot**](https://github.com/HKUDS/nanobot) | 2026 年 2 月 | 来自 HKU-DS 的超轻量级个人 AI 智能体；与重型 harness 的简约设计对比。 |
-| [**HKUDS/OpenHarness**](https://github.com/HKUDS/OpenHarness) | 2026 年 4 月 | 带有内置个人智能体（Ohmo）的开放智能体 harness；harness 架构的学术参考点。 |
-| [**openai/symphony**](https://github.com/openai/symphony) | 2026 年 2 月 | OpenAI 的编排方案，用于隔离、自主的实现运行——对应并行会话这一设计维度。 |
-| [**karpathy/autoresearch**](https://github.com/karpathy/autoresearch) | 2026 年 3 月 | Andrej Karpathy 出品：在单 GPU 上自动运行 nanochat 训练研究的 AI 智能体循环。 |
-| [**HKUDS/CLI-Anything**](https://github.com/HKUDS/CLI-Anything) | 2026 年 3 月 | "Making ALL Software Agent-Native"——把任意软件包装成智能体可调用工具的统一 CLI 接入层。 |
-| [**Panniantong/Agent-Reach**](https://github.com/Panniantong/Agent-Reach) | 2026 年 2 月 | 一个 CLI 让智能体免费读写 Twitter、Reddit、YouTube、GitHub、Bilibili、小红书；自带 MCP 和 Claude Code / Cursor 集成。 |
-| [**agentscope-ai/QwenPaw**](https://github.com/agentscope-ai/QwenPaw) | 2026 年 2 月 | AgentScope 团队的个人 AI 助手——本地或云端部署，支持多聊天 app，能力可扩展。 |
-| [**cft0808/edict**](https://github.com/cft0808/edict) | 2026 年 2 月 | "三省六部制"——基于 OpenClaw 的多智能体编排系统，9 个专门智能体 + 实时 dashboard + 模型配置 + 完整审计追踪。 |
+| [**openclaw/openclaw**](https://github.com/openclaw/openclaw) [![Star](https://img.shields.io/github/stars/openclaw/openclaw.svg?style=social&label=Star)](https://github.com/openclaw/openclaw) | 2026 年 1 月 | 跨消息平台的本地优先个人 AI 助手。 |
+| [**sst/opencode**](https://github.com/sst/opencode) [![Star](https://img.shields.io/github/stars/sst/opencode.svg?style=social&label=Star)](https://github.com/sst/opencode) | 2025 年 6 月 | 与模型厂商无关的终端编码智能体。 |
+| [**NousResearch/hermes-agent**](https://github.com/nousresearch/hermes-agent) [![Star](https://img.shields.io/github/stars/nousresearch/hermes-agent.svg?style=social&label=Star)](https://github.com/nousresearch/hermes-agent) | 2026 年 2 月 | 具有跨会话记忆的自我改进个人智能体。 |
+| [**666ghj/MiroFish**](https://github.com/666ghj/MiroFish) [![Star](https://img.shields.io/github/stars/666ghj/MiroFish.svg?style=social&label=Star)](https://github.com/666ghj/MiroFish) | 2026 年 3 月 | 多智能体群体智能模拟引擎。 |
+| [**MemPalace/mempalace**](https://github.com/MemPalace/mempalace) [![Star](https://img.shields.io/github/stars/MemPalace/mempalace.svg?style=social&label=Star)](https://github.com/MemPalace/mempalace) | 2026 年 | AI 智能体的本地优先记忆系统。 |
+| [**multica-ai/multica**](https://github.com/multica-ai/multica) [![Star](https://img.shields.io/github/stars/multica-ai/multica.svg?style=social&label=Star)](https://github.com/multica-ai/multica) | 2026 年 | 用于任务分配和技能复合的托管智能体平台。 |
+| [**badlogic/pi-mono**](https://github.com/badlogic/pi-mono) [![Star](https://img.shields.io/github/stars/badlogic/pi-mono.svg?style=social&label=Star)](https://github.com/badlogic/pi-mono) | 2025 年 8 月 | monorepo 编码智能体工具包——统一 LLM API（OpenAI/Anthropic/Google）、TUI + web UI、per-cwd 会话持久化。 |
+| [**coleam00/Archon**](https://github.com/coleam00/Archon) [![Star](https://img.shields.io/github/stars/coleam00/Archon.svg?style=social&label=Star)](https://github.com/coleam00/Archon) | 2025 年 2 月 | 确定性 harness——YAML 定义的工作流与执行审计跟踪；与模型驱动的智能体循环对比。 |
+| [**HKUDS/nanobot**](https://github.com/HKUDS/nanobot) [![Star](https://img.shields.io/github/stars/HKUDS/nanobot.svg?style=social&label=Star)](https://github.com/HKUDS/nanobot) | 2026 年 2 月 | 来自 HKU-DS 的超轻量级个人 AI 智能体；与重型 harness 的简约设计对比。 |
+| [**HKUDS/OpenHarness**](https://github.com/HKUDS/OpenHarness) [![Star](https://img.shields.io/github/stars/HKUDS/OpenHarness.svg?style=social&label=Star)](https://github.com/HKUDS/OpenHarness) | 2026 年 4 月 | 带有内置个人智能体（Ohmo）的开放智能体 harness；harness 架构的学术参考点。 |
+| [**openai/symphony**](https://github.com/openai/symphony) [![Star](https://img.shields.io/github/stars/openai/symphony.svg?style=social&label=Star)](https://github.com/openai/symphony) | 2026 年 2 月 | OpenAI 的编排方案，用于隔离、自主的实现运行——对应并行会话这一设计维度。 |
+| [**karpathy/autoresearch**](https://github.com/karpathy/autoresearch) [![Star](https://img.shields.io/github/stars/karpathy/autoresearch.svg?style=social&label=Star)](https://github.com/karpathy/autoresearch) | 2026 年 3 月 | Andrej Karpathy 出品：在单 GPU 上自动运行 nanochat 训练研究的 AI 智能体循环。 |
+| [**HKUDS/CLI-Anything**](https://github.com/HKUDS/CLI-Anything) [![Star](https://img.shields.io/github/stars/HKUDS/CLI-Anything.svg?style=social&label=Star)](https://github.com/HKUDS/CLI-Anything) | 2026 年 3 月 | "Making ALL Software Agent-Native"——把任意软件包装成智能体可调用工具的统一 CLI 接入层。 |
+| [**Panniantong/Agent-Reach**](https://github.com/Panniantong/Agent-Reach) [![Star](https://img.shields.io/github/stars/Panniantong/Agent-Reach.svg?style=social&label=Star)](https://github.com/Panniantong/Agent-Reach) | 2026 年 2 月 | 一个 CLI 让智能体免费读写 Twitter、Reddit、YouTube、GitHub、Bilibili、小红书；自带 MCP 和 Claude Code / Cursor 集成。 |
+| [**agentscope-ai/QwenPaw**](https://github.com/agentscope-ai/QwenPaw) [![Star](https://img.shields.io/github/stars/agentscope-ai/QwenPaw.svg?style=social&label=Star)](https://github.com/agentscope-ai/QwenPaw) | 2026 年 2 月 | AgentScope 团队的个人 AI 助手——本地或云端部署，支持多聊天 app，能力可扩展。 |
+| [**cft0808/edict**](https://github.com/cft0808/edict) [![Star](https://img.shields.io/github/stars/cft0808/edict.svg?style=social&label=Star)](https://github.com/cft0808/edict) | 2026 年 2 月 | "三省六部制"——基于 OpenClaw 的多智能体编排系统，9 个专门智能体 + 实时 dashboard + 模型配置 + 完整审计追踪。 |
 
 <p align="right"><a href="#深入理解-claude-code">↑ 返回顶部</a></p>
 
