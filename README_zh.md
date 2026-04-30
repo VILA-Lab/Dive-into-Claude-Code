@@ -369,6 +369,16 @@ Claude Code 回答了每个生产级编码智能体都必须面对的**四个设
 | [**FlorianBruniaux/claude-code-ultimate-guide**](https://github.com/FlorianBruniaux/claude-code-ultimate-guide) [![Star](https://img.shields.io/github/stars/FlorianBruniaux/claude-code-ultimate-guide.svg?style=social&label=Star)](https://github.com/FlorianBruniaux/claude-code-ultimate-guide) | 从初学者到高级用户的指南，包含生产级模板、智能体工作流指南和速查表。 |
 | [**affaan-m/everything-claude-code**](https://github.com/affaan-m/everything-claude-code) [![Star](https://img.shields.io/github/stars/affaan-m/everything-claude-code.svg?style=social&label=Star)](https://github.com/affaan-m/everything-claude-code) | 智能体 harness 优化——skills、本能、记忆、安全和研究优先开发。 |
 
+### Harness Engineering：设计空间与学习资源
+
+与本文设计空间分析相互呼应的外部资源——概念文章、课程和代码，从工程实践视角刻画 harness 这一层。
+
+| 仓库 | 描述 |
+|:-----------|:------------|
+| [**deusyu/harness-engineering**](https://github.com/deusyu/harness-engineering) [![Star](https://img.shields.io/github/stars/deusyu/harness-engineering.svg?style=social&label=Star)](https://github.com/deusyu/harness-engineering) | 中文学习档案——8 篇原创概念解读、6 篇独立思考、12 篇外文翻译；从概念理解到独立实践的 Harness Engineering 入门。 |
+| [**walkinglabs/learn-harness-engineering**](https://github.com/walkinglabs/learn-harness-engineering) [![Star](https://img.shields.io/github/stars/walkinglabs/learn-harness-engineering.svg?style=social&label=Star)](https://github.com/walkinglabs/learn-harness-engineering) | 英文项目制课程——PDF 课本、大纲与 capstone 项目，围绕指令、状态管理、验证机制、作用域约束和会话生命周期这五个 harness 子系统展开。 |
+| [**china-qijizhifeng/agentic-harness-engineering**](https://github.com/china-qijizhifeng/agentic-harness-engineering) [![Star](https://img.shields.io/github/stars/china-qijizhifeng/agentic-harness-engineering.svg?style=social&label=Star)](https://github.com/china-qijizhifeng/agentic-harness-engineering) | 自动演化 coding agent harness 的可观测系统——一个 meta-agent 读取执行 trace，自动改写 system prompt、工具、中间件、skills、子 agent 和记忆。 |
+
 ### 博客文章与技术文章
 
 | 文章 | 它的价值所在 |
