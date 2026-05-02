@@ -40,6 +40,7 @@
 **论文之外**
 
 - [🛠️ 构建你自己的 AI 智能体：设计指南](#构建你自己的-ai-智能体设计指南)
+- [⚖️ 跨系统对比：Claude Code vs OpenClaw vs Hermes-Agent](#跨系统对比claude-code-vs-openclaw-vs-hermes-agent)
 - [🌐 社区项目与研究](#社区项目与研究)
 - [🚀 其他值得关注的 AI 智能体项目](#其他值得关注的-ai-智能体项目)
 - [🔖 引用](#引用)
@@ -296,6 +297,25 @@ Claude Code 回答了每个生产级编码智能体都必须面对的**四个设
 | [**会话持久化**](./docs/build-your-own-agent_zh.md#决策-6会话如何持久化) | 什么会延续到下一次会话？ | 恢复会话时绝不自动恢复权限。可审计性优先于查询能力。 |
 
 **阅读完整指南：[docs/build-your-own-agent_zh.md](./docs/build-your-own-agent_zh.md)**
+
+<p align="right"><a href="#深入理解-claude-code">↑ 返回顶部</a></p>
+
+---
+
+## 跨系统对比：Claude Code vs OpenClaw vs Hermes-Agent
+
+同样的设计问题，在不同的部署情境下会给出不同的架构答案。下表以论文第 10 节用于 OpenClaw 对比的六个设计维度，对 Claude Code v2.1.88 与两个具有代表性的同类系统进行对比——[OpenClaw](https://github.com/openclaw/openclaw)（本地优先的多渠道个人助手网关）和 [NousResearch/hermes-agent](https://github.com/NousResearch/hermes-agent)（支持多部署场景的自改进智能体）。各单元格均有来源依据，这不是功能评分表。
+
+| 设计维度 | Claude Code (v2.1.88) [![Star](https://img.shields.io/github/stars/anthropics/claude-code.svg?style=social&label=Star)](https://github.com/anthropics/claude-code) | OpenClaw [![Star](https://img.shields.io/github/stars/openclaw/openclaw.svg?style=social&label=Star)](https://github.com/openclaw/openclaw) | Hermes-Agent [![Star](https://img.shields.io/github/stars/NousResearch/hermes-agent.svg?style=social&label=Star)](https://github.com/NousResearch/hermes-agent) |
+|:---|:---|:---|:---|
+| **系统范围与部署** | 面向编程的单用户 CLI / SDK / IDE 接口；所有入口共用一个 `queryLoop` 异步生成器。 | 本地优先 WebSocket 网关（默认端口 18789，默认仅监听回环地址）；将约 23 个消息渠道路由至内嵌智能体运行时；提供 macOS、iOS、Android 伴侣应用。 | 三个入口：`hermes`（交互式 CLI）、`hermes-agent`（程序化运行时）、`hermes-acp`（ACP 服务器）；网关适配器将消息路由至按 LRU 缓存的 AIAgent 实例（最多 128 个，空闲超时 1 小时）；也可通过 `hermes mcp serve` 作为 MCP 服务器运行。 |
+| **信任模型与安全** | 拒绝优先的逐动作评估；7 种权限模式；基于 LLM 的自动模式分类器（`yoloClassifier` / `sideQuery`）；会话级权限状态（会话绕过标志、应用白名单状态）在恢复时不予还原。 | 单一可信操作员模型；DM 配对码、发件人白名单、网关身份验证；每个智能体有独立的工具允许/拒绝策略；通过 Docker / SSH / OpenShell 提供可选沙箱，默认关闭；`non-main` 模式可对非主会话启用沙箱；明确声明不支持对共享网关上的恶意多租户的隔离。 | 危险命令模式检测，配合会话级审批状态；CLI 交互提示与网关异步提示；辅助 LLM 智能审批可自动批准低风险命令；永久白名单持久化于 `config.yaml`；子智能体工作线程默认自动拒绝危险命令（可通过 `subagent_auto_approve` 开启批处理/定时任务的自动批准）。 |
+| **智能体运行时与工具** | 单一 `queryLoop` 异步生成器，以流式事件方式产出；环境与特性门控的工具注册表；API 调用前按条件运行压缩（Snip、Microcompact、Context Collapse、Auto-Compact），Auto-Compact 优先尝试会话记忆压缩。 | 内嵌智能体运行时位于网关 RPC 调度层内部（`agent` RPC 校验参数后立即返回，异步执行，并通过网关协议回传生命周期/流式事件）；每个会话有独立队列序列化，支持可选的全局通道。 | While 循环，含显式的每轮迭代预算和宽限调用槽；每轮检查点去重；网关 `step_callback` 钩子在每次迭代时触发；辅助模型上下文压缩对中间轮次进行摘要，同时保护头尾。 |
+| **扩展架构** | 四种机制按上下文开销递增排列：hooks → skills → plugins → MCP；27 个钩子事件；10 种插件组件类型。 | 清单优先插件系统，含 12 个能力类别；中央注册表暴露工具、渠道、provider 设置、钩子、HTTP 路由、CLI 命令和服务；独立技能层支持多来源（工作区优先级最高）及 ClawHub 公共注册表；`openclaw mcp` 同时提供 MCP 服务器接口和面向其他 MCP 服务器的出站客户端注册表。 | `plugins/` 目录下内置 12 个插件（context_engine、disk-cleanup、example-dashboard、google_meet、hermes-achievements、image_gen、kanban、memory、observability、platforms、spotify、strike-freedom-cockpit）；MCP 服务器（`mcp_serve.py`）暴露 10 个工具；ACP 适配器（`acp_adapter/`）将 Hermes 暴露为 ACP 服务器。 |
+| **记忆与上下文** | 四层 CLAUDE.md 层级；API 调用前压缩（Snip、Microcompact、Context Collapse、Auto-Compact）；基于 LLM 从文件型 Markdown 记忆文件中进行选择。 | 工作区启动文件（AGENTS.md、SOUL.md、TOOLS.md、IDENTITY.md、USER.md）及条件性 BOOTSTRAP.md / HEARTBEAT.md / MEMORY.md；独立记忆系统（MEMORY.md、`memory/YYYY-MM-DD.md` 格式的每日笔记、可选 DREAMS.md）；配置 embedding provider 后启用向量+关键词混合检索；实验性 dreaming 在后台整合并将符合条件的条目提升至长期记忆；可插拔压缩 provider。 | SQLite 状态存储，含 FTS5 全文检索和 WAL 模式并发读取；sessions 通过 `parent_session_id` 链接以支持压缩触发的会话拆分；`plugins/memory/` 下提供 8 个可换记忆后端（byterover、hindsight、holographic、honcho、mem0、openviking、retaindb、supermemory）；辅助 LLM 压缩作为独立的上下文管理层。 |
+| **多智能体架构** | 通过侧链转录委托子智能体；6 种内置智能体定义（可用性取决于构建/模式）加自定义；父节点仅接收单条摘要消息（in-process / viewable transcript 情况下可保留更多内部细节）；隔离设置包含 `worktree` 和 `remote`，swarm 路径中有 `in-process` 队友后端。 | 两层架构。(1) 多智能体路由：每渠道独立智能体，拥有各自的工作区、认证配置、会话存储和模型配置，通过确定性绑定规则分发。(2) 子智能体委托：`maxSpawnDepth` 范围 1–5，默认 1，建议 2；工具策略按深度变化；项目愿景（VISION.md）明确拒绝将智能体层级框架作为默认架构。 | `delegate_task` 工具在 `ThreadPoolExecutor` 中派生子 AIAgent 实例（父节点阻塞直至子节点完成）；每个子节点有全新对话历史、独立 `task_id`，以及受限工具集（`DELEGATE_BLOCKED_TOOLS` 移除了 `delegate_task`、`clarify`、`memory`、`send_message`、`execute_code`）；默认深度 `MAX_DEPTH = 1`（可配置，上限为 3）；默认 3 个并发子节点。 |
+
+**对比揭示了什么。** 从表格中可以得出三点观察。第一，**部署情境**决定了大多数下游设计选择：面向单用户的编程 CLI 收敛于逐动作审批和单一执行循环，多渠道网关收敛于边界信任和渠道绑定的智能体，多部署消息云端智能体则收敛于可选容器/云隔离、LLM 智能审批和可换后端记忆层。第二，**扩展层是各系统最鲜明的差异化所在**：Claude Code 按上下文开销将四种机制分层，OpenClaw 将扩展视为网关层的注册表管理能力，Hermes-Agent 则内置插件组并对外暴露双 MCP 服务器 / ACP 服务器接口供其他智能体接入。第三，**记忆架构跨越一个连续谱**：文件型、可检视的 Markdown（Claude Code），文件型加可选向量及实验性 dreaming（OpenClaw），或 FTS5 全文索引加八个可换插件后端（含专用向量 / RAG provider）（Hermes-Agent）。此表最适合作为设计空间中三个不同定点来阅读，而非功能排行榜。
 
 <p align="right"><a href="#深入理解-claude-code">↑ 返回顶部</a></p>
 
