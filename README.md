@@ -97,7 +97,7 @@ The system decomposes into **7 components** (User → Interfaces → Agent Loop 
 
 ---
 
-<details open>
+<details>
 <summary><h2>Values and Design Principles</h2></summary>
 
 The architecture traces from **5 human values** through **13 design principles** to implementation:
@@ -166,7 +166,7 @@ The core is a **ReAct-pattern while-loop**: assemble context → call model → 
 
 ---
 
-<details open>
+<details>
 <summary><h2>Safety and Permissions</h2></summary>
 
 <p align="center">
@@ -220,7 +220,7 @@ The core is a **ReAct-pattern while-loop**: assemble context → call model → 
 
 ---
 
-<details open>
+<details>
 <summary><h2>Context and Memory</h2></summary>
 
 <p align="center">

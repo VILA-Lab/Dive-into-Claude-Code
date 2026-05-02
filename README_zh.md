@@ -97,7 +97,7 @@ Claude Code 回答了每个生产级编码智能体都必须面对的**四个设
 
 ---
 
-<details open>
+<details>
 <summary><h2>价值观与设计原则</h2></summary>
 
 架构从**5 个人类价值观**追溯到**13 条设计原则**再到实现：
@@ -166,7 +166,7 @@ Claude Code 回答了每个生产级编码智能体都必须面对的**四个设
 
 ---
 
-<details open>
+<details>
 <summary><h2>安全与权限</h2></summary>
 
 <p align="center">
@@ -220,7 +220,7 @@ Claude Code 回答了每个生产级编码智能体都必须面对的**四个设
 
 ---
 
-<details open>
+<details>
 <summary><h2>上下文与记忆</h2></summary>
 
 <p align="center">
