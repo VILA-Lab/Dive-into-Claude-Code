@@ -335,6 +335,7 @@ Primary sources referenced throughout the paper — Anthropic's own engineering 
 |:--------|:------|
 | [Building Effective Agents](https://www.anthropic.com/research/building-effective-agents) | Foundational: simple composable patterns over heavy frameworks. |
 | [Effective Context Engineering for AI Agents](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents) | Context curation and token-budget management. |
+| [Prompt Caching with Claude](https://www.anthropic.com/news/prompt-caching) | Cache reads at 10% cost, writes at 125%; 5-min default TTL. The platform feature that makes Claude Code's cache-aware compaction architecturally meaningful. |
 | [Harness Design for Long-Running Application Development](https://anthropic.com/engineering/harness-design-long-running-apps) | Harness architecture for autonomous full-stack dev; multi-agent patterns. |
 | [Claude Code Auto Mode: A Safer Way to Skip Permissions](https://www.anthropic.com/engineering/claude-code-auto-mode) | ML-classifier approval automation; source of the 93% approval-rate finding. |
 | [Beyond Permission Prompts: Making Claude Code More Secure and Autonomous](https://www.anthropic.com/engineering/claude-code-sandboxing) | Sandbox-based security; 84% reduction in permission prompts. |

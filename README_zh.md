@@ -335,6 +335,7 @@ Claude Code 回答了每个生产级编码智能体都必须面对的**四个设
 |:--------|:------|
 | [Building Effective Agents](https://www.anthropic.com/research/building-effective-agents) | 基础：简单的可组合模式优于重型框架。 |
 | [Effective Context Engineering for AI Agents](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents) | 上下文策划和 token 预算管理。 |
+| [Prompt Caching with Claude](https://www.anthropic.com/news/prompt-caching) | 缓存读取费用为 10%、写入为 125%；默认 TTL 5 分钟。Claude Code 整套 cache-aware 压缩策略所依赖的平台特性基础。 |
 | [Harness Design for Long-Running Application Development](https://anthropic.com/engineering/harness-design-long-running-apps) | 自主全栈开发的 harness 架构；多智能体模式。 |
 | [Claude Code Auto Mode: A Safer Way to Skip Permissions](https://www.anthropic.com/engineering/claude-code-auto-mode) | ML 分类器批准自动化；93% 批准率发现的来源。 |
 | [Beyond Permission Prompts: Making Claude Code More Secure and Autonomous](https://www.anthropic.com/engineering/claude-code-sandboxing) | 基于沙箱的安全；权限提示减少 84%。 |
