@@ -38,6 +38,7 @@
 | 2026-05 | [LangChain: LangSmith Sandboxes GA](https://www.langchain.com/blog/langsmith-sandboxes-generally-available) | microVM kernel isolation、snapshots/forks、prewarmed environments、Service URLs、Auth Proxy。 | 说明 production agent 不能只靠“容器式 sandbox”；执行环境本身是安全边界。 |
 | 2026-05 | [LangChain: Introducing Managed Deep Agents](https://www.langchain.com/blog/introducing-managed-deep-agents) | 托管 runtime 提供 durable threads、checkpointing、streaming、context、observability、human-in-the-loop。 | 对应“open-source harness + managed runtime”的拆分方式。 |
 | 2026-05 | [LangChain: Introducing Context Hub](https://www.langchain.com/blog/introducing-context-hub) | 把 `AGENTS.md`、skills、policies、examples、memory files 版本化、可回滚、可协作。 | 直接支撑“context as first-class artifact”：context 需要自己的生命周期，而不是散落在 prompt 里。 |
+| 2026-05 | [Claude Code Dynamic Workflows](https://code.claude.com/docs/en/workflows) + [Opus 4.8](https://www.anthropic.com/news/claude-opus-4-8) | Claude 自己写 JavaScript 编排脚本，后台 runtime 扇出到上千个 subagent；中间状态存在脚本变量（对话之外），只有最终答案进入 context；16 并发 / 1000 总量上限，同一 session 内可 resume。随 Opus 4.8（2026-05-28）一同发布，v2.1.154 引入，research preview。 | 直接延伸本文 §8 subagent 编排与 Future「超越 session / sub-agent / memory 的新协调原语」：编排逻辑从对话搬进代码，是 context-as-bottleneck 原则的下一步。 |
 
 ## P1: 强相关资料
 

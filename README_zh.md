@@ -372,6 +372,7 @@ Claude Code 回答了每个生产级编码智能体都必须面对的**四个设
 | [Measuring AI Agent Autonomy in Practice](https://anthropic.com/research/measuring-agent-autonomy) | 长期使用数据：随着用户熟练度提升，自动批准率从约 20% 上升到 40% 以上。 |
 | [Our Framework for Developing Safe and Trustworthy Agents](https://www.anthropic.com/news/our-framework-for-developing-safe-and-trustworthy-agents) | 负责任智能体部署的治理框架。 |
 | [Scaling Managed Agents: Decoupling the Brain from the Hands](https://www.anthropic.com/engineering/managed-agents) | 分离推理、执行和会话的托管服务架构。 |
+| [Introducing Claude Opus 4.8](https://www.anthropic.com/news/claude-opus-4-8) | 2026 年 5 月模型更新：判断力与诚实度提升（代码缺陷漏判约减少 4 倍）、可自主运行更久；在 research preview 中引入 dynamic workflows。 |
 
 #### 产品文档
 
@@ -382,6 +383,9 @@ Claude Code 回答了每个生产级编码智能体都必须面对的**四个设
 | [Hooks](https://code.claude.com/docs/en/hooks) | 27 事件钩子参考、执行模型、生命周期事件。 |
 | [Memory](https://code.claude.com/docs/en/memory) | CLAUDE.md 层级、自动记忆、习得的偏好。 |
 | [Sub-agents](https://code.claude.com/docs/en/sub-agents) | 专用隔离助手、自定义提示、工具访问。 |
+| [Orchestrate Subagents at Scale with Dynamic Workflows](https://code.claude.com/docs/en/workflows) | Claude 写一段 JavaScript 编排脚本，后台 runtime 扇出到至多 1,000 个 subagent，中间状态保存在脚本变量中、不进入 context window（v2.1.154+，research preview）。 |
+| [What's New in Claude Opus 4.8](https://platform.claude.com/docs/en/about-claude/models/whats-new-claude-4-8) | 对话中途 system 消息（保留 prompt cache）、更低的可缓存 prompt 阈值、更少 compaction 与更好的 compaction 恢复。 |
+| [Claude Code CHANGELOG](https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md) | 发布说明；dynamic workflows 与 Opus 4.8 在 v2.1.154 落地。 |
 
 ### 架构分析
 

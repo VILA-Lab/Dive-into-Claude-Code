@@ -372,6 +372,7 @@ Primary sources referenced throughout the paper — Anthropic's own engineering 
 | [Measuring AI Agent Autonomy in Practice](https://anthropic.com/research/measuring-agent-autonomy) | Longitudinal usage: auto-approve rates grow from ~20% to 40%+ with experience. |
 | [Our Framework for Developing Safe and Trustworthy Agents](https://www.anthropic.com/news/our-framework-for-developing-safe-and-trustworthy-agents) | Governance framework for responsible agent deployment. |
 | [Scaling Managed Agents: Decoupling the Brain from the Hands](https://www.anthropic.com/engineering/managed-agents) | Hosted-service architecture separating reasoning, execution, and session. |
+| [Introducing Claude Opus 4.8](https://www.anthropic.com/news/claude-opus-4-8) | May 2026 model update: sharper judgment and honesty (~4x fewer unremarked code flaws), longer autonomous runs; introduces dynamic workflows in research preview. |
 
 #### Product Documentation
 
@@ -382,6 +383,9 @@ Primary sources referenced throughout the paper — Anthropic's own engineering 
 | [Hooks](https://code.claude.com/docs/en/hooks) | 27-event hook reference, execution models, lifecycle events. |
 | [Memory](https://code.claude.com/docs/en/memory) | CLAUDE.md hierarchy, auto memory, learned preferences. |
 | [Sub-agents](https://code.claude.com/docs/en/sub-agents) | Specialized isolated assistants, custom prompts, tool access. |
+| [Orchestrate Subagents at Scale with Dynamic Workflows](https://code.claude.com/docs/en/workflows) | Claude writes a JavaScript orchestration script; a background runtime fans out to up to 1,000 subagents, with intermediate state held in script variables outside the context window (v2.1.154+, research preview). |
+| [What's New in Claude Opus 4.8](https://platform.claude.com/docs/en/about-claude/models/whats-new-claude-4-8) | Mid-conversation system messages (prompt-cache-preserving), lower cacheable-prompt minimum, fewer compactions and better compaction recovery. |
+| [Claude Code CHANGELOG](https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md) | Release notes; dynamic workflows and Opus 4.8 land in v2.1.154. |
 
 ### Architecture Analysis
 
