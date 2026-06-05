@@ -485,6 +485,7 @@ Claude Code 回答了每个生产级编码智能体都必须面对的**四个设
 |:-----------|:-------|:------|
 | [**openclaw/openclaw**](https://github.com/openclaw/openclaw) [![Star](https://img.shields.io/github/stars/openclaw/openclaw.svg?style=social&label=Star)](https://github.com/openclaw/openclaw) | 2026 年 1 月 | 跨消息平台的本地优先个人 AI 助手。（[第 10 节分析](#跨系统对比claude-code-vs-openclaw-vs-hermes-agent)） |
 | [**NousResearch/hermes-agent**](https://github.com/nousresearch/hermes-agent) [![Star](https://img.shields.io/github/stars/nousresearch/hermes-agent.svg?style=social&label=Star)](https://github.com/nousresearch/hermes-agent) | 2026 年 2 月 | 具有跨会话记忆的自我改进个人智能体。（[第 10 节分析](#跨系统对比claude-code-vs-openclaw-vs-hermes-agent)） |
+| [**opensquilla/opensquilla**](https://github.com/opensquilla/opensquilla) [![Star](https://img.shields.io/github/stars/opensquilla/opensquilla.svg?style=social&label=Star)](https://github.com/opensquilla/opensquilla) | 2026 年 6 月 | 主打 token 效率的微内核个人智能体，覆盖 CLI、Web UI 与聊天渠道；用 ML 分类器在四档成本的模型间路由，本地 Markdown+SQLite 记忆（MEMORY.md 加按日期的笔记，支持关键词与向量召回），Bubblewrap/Seatbelt 沙箱。 |
 | [**sst/opencode**](https://github.com/sst/opencode) [![Star](https://img.shields.io/github/stars/sst/opencode.svg?style=social&label=Star)](https://github.com/sst/opencode) | 2025 年 6 月 | 与模型厂商无关的终端编码智能体，集成 ACP。 |
 | [**Aider-AI/aider**](https://github.com/Aider-AI/aider) [![Star](https://img.shields.io/github/stars/Aider-AI/aider.svg?style=social&label=Star)](https://github.com/Aider-AI/aider) | 2023 年 | 在终端中与 LLM 结对编程，支持主流模型。 |
 | [**continuedev/continue**](https://github.com/continuedev/continue) [![Star](https://img.shields.io/github/stars/continuedev/continue.svg?style=social&label=Star)](https://github.com/continuedev/continue) | 2023 年 | IDE 中受版本控制的 AI 检查，配套开源 Continue CLI。 |
@@ -526,6 +527,7 @@ Claude Code 回答了每个生产级编码智能体都必须面对的**四个设
 |:-----------|:-------|:------|
 | [**addyosmani/agent-skills**](https://github.com/addyosmani/agent-skills) [![Star](https://img.shields.io/github/stars/addyosmani/agent-skills.svg?style=social&label=Star)](https://github.com/addyosmani/agent-skills) | 2025 年 | 22 个生命周期 skill 配套斜杠命令（`/spec`、`/plan`、`/build`、`/test`、`/review`、`/ship`）。 |
 | [**obra/superpowers**](https://github.com/obra/superpowers) [![Star](https://img.shields.io/github/stars/obra/superpowers.svg?style=social&label=Star)](https://github.com/obra/superpowers) | 2025 年 | 跨 harness（Claude Code、OpenCode、Codex）的强制工作流 skill 框架。 |
+| [**mattpocock/skills**](https://github.com/mattpocock/skills) [![Star](https://img.shields.io/github/stars/mattpocock/skills.svg?style=social&label=Star)](https://github.com/mattpocock/skills) | 2026 年 | 作者日常使用的 `.claude/skills` skill 集，面向真实工程——可组合的 TDD、diagnose、to-issues/to-prd；与模型无关，面向 Claude Code、Codex 等编码智能体。 |
 | [**lsdefine/GenericAgent**](https://github.com/lsdefine/GenericAgent) [![Star](https://img.shields.io/github/stars/lsdefine/GenericAgent.svg?style=social&label=Star)](https://github.com/lsdefine/GenericAgent) | 2025 年 | 极简自演化自主智能体框架——9 个原子工具加约 100 行 ReAct 循环。 |
 
 ### MCP 生态
