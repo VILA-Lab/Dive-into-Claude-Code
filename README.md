@@ -376,6 +376,7 @@ Primary sources referenced throughout the paper — Anthropic's own engineering 
 | [Scaling Managed Agents: Decoupling the Brain from the Hands](https://www.anthropic.com/engineering/managed-agents) | Hosted-service architecture separating reasoning, execution, and session. |
 | [An Update on Recent Claude Code Quality Reports](https://www.anthropic.com/engineering/april-23-postmortem) | Postmortem on three bugs behind perceived quality drops: a reasoning-effort default, a cache optimization bug, and a system-prompt change. |
 | [Introducing Claude Opus 4.8](https://www.anthropic.com/news/claude-opus-4-8) | May 2026 model update: sharper judgment and honesty (~4x fewer unremarked code flaws), longer autonomous runs; introduces dynamic workflows in research preview. |
+| [Claude Fable 5 and Claude Mythos 5](https://www.anthropic.com/news/claude-fable-5-mythos-5) | June 2026 Mythos-class tier sitting above Opus; Fable 5 is the general-use configuration (risky queries fall back to Opus 4.8), with state-of-the-art software-engineering and agentic-coding performance. |
 
 #### Product Documentation
 
@@ -531,6 +532,7 @@ A broader map of the agent design space surrounding Claude Code. The [Cross-Syst
 | [**addyosmani/agent-skills**](https://github.com/addyosmani/agent-skills) [![Star](https://img.shields.io/github/stars/addyosmani/agent-skills.svg?style=social&label=Star)](https://github.com/addyosmani/agent-skills) | 2025 | 22 lifecycle skills + slash commands (`/spec`, `/plan`, `/build`, `/test`, `/review`, `/ship`). |
 | [**obra/superpowers**](https://github.com/obra/superpowers) [![Star](https://img.shields.io/github/stars/obra/superpowers.svg?style=social&label=Star)](https://github.com/obra/superpowers) | 2025 | Cross-harness mandatory-workflow skills framework (Claude Code, OpenCode, Codex). |
 | [**mattpocock/skills**](https://github.com/mattpocock/skills) [![Star](https://img.shields.io/github/stars/mattpocock/skills.svg?style=social&label=Star)](https://github.com/mattpocock/skills) | 2026 | Author's everyday `.claude/skills` collection for real engineering -- composable TDD, diagnose, and to-issues/to-prd skills; model-agnostic, targeting Claude Code, Codex, and other coding agents. |
+| [**multica-ai/andrej-karpathy-skills**](https://github.com/multica-ai/andrej-karpathy-skills) [![Star](https://img.shields.io/github/stars/multica-ai/andrej-karpathy-skills.svg?style=social&label=Star)](https://github.com/multica-ai/andrej-karpathy-skills) | 2026 | Single CLAUDE.md encoding Andrej Karpathy's four LLM-coding rules (think before coding, simplicity first, surgical changes, goal-driven execution); installable as a plugin or per-project. |
 | [**lsdefine/GenericAgent**](https://github.com/lsdefine/GenericAgent) [![Star](https://img.shields.io/github/stars/lsdefine/GenericAgent.svg?style=social&label=Star)](https://github.com/lsdefine/GenericAgent) | 2025 | Minimal self-evolving autonomous agent framework — 9 atomic tools + ~100-line ReAct loop. |
 
 ### MCP Ecosystem

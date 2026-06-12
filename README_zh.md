@@ -376,6 +376,7 @@ Claude Code 回答了每个生产级编码智能体都必须面对的**四个设
 | [Scaling Managed Agents: Decoupling the Brain from the Hands](https://www.anthropic.com/engineering/managed-agents) | 分离推理、执行和会话的托管服务架构。 |
 | [An Update on Recent Claude Code Quality Reports](https://www.anthropic.com/engineering/april-23-postmortem) | 复盘导致质量观感下降的三个 bug：reasoning-effort 默认值、一处缓存优化 bug，以及一次系统提示改动。 |
 | [Introducing Claude Opus 4.8](https://www.anthropic.com/news/claude-opus-4-8) | 2026 年 5 月模型更新：判断力与诚实度提升（代码缺陷漏判约减少 4 倍）、可自主运行更久；在 research preview 中引入 dynamic workflows。 |
+| [Claude Fable 5 and Claude Mythos 5](https://www.anthropic.com/news/claude-fable-5-mythos-5) | 2026 年 6 月推出位于 Opus 之上的 Mythos 级别；Fable 5 为面向通用场景的安全配置（高风险请求回退到 Opus 4.8），在软件工程与智能体编码上达到 SOTA。 |
 
 #### 产品文档
 
@@ -531,6 +532,7 @@ Claude Code 回答了每个生产级编码智能体都必须面对的**四个设
 | [**addyosmani/agent-skills**](https://github.com/addyosmani/agent-skills) [![Star](https://img.shields.io/github/stars/addyosmani/agent-skills.svg?style=social&label=Star)](https://github.com/addyosmani/agent-skills) | 2025 年 | 22 个生命周期 skill 配套斜杠命令（`/spec`、`/plan`、`/build`、`/test`、`/review`、`/ship`）。 |
 | [**obra/superpowers**](https://github.com/obra/superpowers) [![Star](https://img.shields.io/github/stars/obra/superpowers.svg?style=social&label=Star)](https://github.com/obra/superpowers) | 2025 年 | 跨 harness（Claude Code、OpenCode、Codex）的强制工作流 skill 框架。 |
 | [**mattpocock/skills**](https://github.com/mattpocock/skills) [![Star](https://img.shields.io/github/stars/mattpocock/skills.svg?style=social&label=Star)](https://github.com/mattpocock/skills) | 2026 年 | 作者日常使用的 `.claude/skills` skill 集，面向真实工程——可组合的 TDD、diagnose、to-issues/to-prd；与模型无关，面向 Claude Code、Codex 等编码智能体。 |
+| [**multica-ai/andrej-karpathy-skills**](https://github.com/multica-ai/andrej-karpathy-skills) [![Star](https://img.shields.io/github/stars/multica-ai/andrej-karpathy-skills.svg?style=social&label=Star)](https://github.com/multica-ai/andrej-karpathy-skills) | 2026 年 | 单个 CLAUDE.md，凝练 Andrej Karpathy 关于 LLM 编码的四条规则（先想后写、简洁优先、外科手术式改动、目标驱动执行）；可作为插件安装或按项目添加。 |
 | [**lsdefine/GenericAgent**](https://github.com/lsdefine/GenericAgent) [![Star](https://img.shields.io/github/stars/lsdefine/GenericAgent.svg?style=social&label=Star)](https://github.com/lsdefine/GenericAgent) | 2025 年 | 极简自演化自主智能体框架——9 个原子工具加约 100 行 ReAct 循环。 |
 
 ### MCP 生态
