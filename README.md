@@ -376,7 +376,8 @@ Primary sources referenced throughout the paper — Anthropic's own engineering 
 | [Scaling Managed Agents: Decoupling the Brain from the Hands](https://www.anthropic.com/engineering/managed-agents) | Hosted-service architecture separating reasoning, execution, and session. |
 | [An Update on Recent Claude Code Quality Reports](https://www.anthropic.com/engineering/april-23-postmortem) | Postmortem on three bugs behind perceived quality drops: a reasoning-effort default, a cache optimization bug, and a system-prompt change. |
 | [Introducing Claude Opus 4.8](https://www.anthropic.com/news/claude-opus-4-8) | May 2026 model update: sharper judgment and honesty (~4x fewer unremarked code flaws), longer autonomous runs; introduces dynamic workflows in research preview. |
-| [Claude Fable 5 and Claude Mythos 5](https://www.anthropic.com/news/claude-fable-5-mythos-5) | June 2026 Mythos-class tier sitting above Opus; Fable 5 is the general-use configuration (risky queries fall back to Opus 4.8), with state-of-the-art software-engineering and agentic-coding performance. |
+| [Claude Fable 5 and Claude Mythos 5](https://www.anthropic.com/news/claude-fable-5-mythos-5) | June 2026 Mythos-class tier sitting above Opus; Fable 5 is the general-use configuration (risky queries fall back to Opus 4.8), with state-of-the-art software-engineering and agentic-coding performance. Access was suspended globally on June 12, 2026 (see next row). |
+| [Statement on Suspending Access to Fable 5 and Mythos 5](https://www.anthropic.com/news/fable-mythos-access) | June 12, 2026: a US export-control directive bars foreign-national access; unable to enforce this selectively, Anthropic disabled both models for all users. The cited rationale was a narrow "read a codebase and fix its flaws" jailbreak, which Anthropic disputes as grounds for recall. |
 
 #### Product Documentation
 
@@ -454,6 +455,17 @@ External resources that complement this paper's design-space analysis — concep
 | [WaveSpeed — "Claude Code Architecture: Leaked Source Deep Dive"](https://wavespeed.ai/blog/posts/claude-code-architecture-leaked-source-deep-dive/) | 512K-line TS source deep dive; context compression and anti-distillation. |
 | [Zain Hasan — "Inside Claude Code: An Architecture Deep Dive"](https://zainhas.github.io/blog/2026/inside-claude-code-architecture/) | Layered architecture, 5 entry modes, multi-agent walkthrough. |
 | [Addy Osmani — "Agent Harness Engineering"](https://addyosmani.com/blog/agent-harness-engineering/) | Frames harness engineering as a discipline with named primitives (filesystem/git state, sandboxes, AGENTS.md memory, compaction, planning loops, hooks); cites Claude Code as the canonical mature example. |
+
+### Cross-Vendor Code-Agent Engineering
+
+Official engineering posts from other vendors building code agents — useful for seeing how the same design questions are answered outside Claude Code.
+
+| Resource | Vendor | What's Notable |
+|:---------|:-------|:---------------|
+| [Harness Engineering: Leveraging Codex in an Agent-First World](https://openai.com/index/harness-engineering/) | OpenAI | Frames the "harness" as the constraints, feedback loops, and documentation that make agents reliable; reports a roughly 1M-line beta built with essentially no hand-written code. |
+| [Best Practices for Coding with Agents](https://cursor.com/blog/agent-best-practices) | Cursor | Articulates an agent harness as three components — Instructions, Tools, and Model — orchestrated per model. |
+| [Build with Google Antigravity](https://developers.googleblog.com/build-with-google-antigravity-our-new-agentic-development-platform/) | Google | Agent-first platform: a Manager surface for asynchronous multi-agent orchestration, with Artifacts (plans, screenshots, recordings) as the verification mechanism instead of raw logs. |
+| [Codex Security: Now in Research Preview](https://openai.com/index/codex-security-now-in-research-preview/) | OpenAI | Application-security agent that builds a project-specific threat model, then finds and pressure-tests vulnerabilities in sandboxed validation environments. |
 
 ### Related Academic Papers
 
