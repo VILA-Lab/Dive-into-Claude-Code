@@ -455,6 +455,7 @@ Claude Code 回答了每个生产级编码智能体都必须面对的**四个设
 | [WaveSpeed — "Claude Code Architecture: Leaked Source Deep Dive"](https://wavespeed.ai/blog/posts/claude-code-architecture-leaked-source-deep-dive/) | 512K 行 TS 源码深度剖析；上下文压缩和反蒸馏。 |
 | [Zain Hasan — "Inside Claude Code: An Architecture Deep Dive"](https://zainhas.github.io/blog/2026/inside-claude-code-architecture/) | 分层架构、5 种入口模式、多智能体演练。 |
 | [Addy Osmani — "Agent Harness Engineering"](https://addyosmani.com/blog/agent-harness-engineering/) | 把 harness engineering 视为一门工程学科，给出命名化的原语（文件系统/git 状态、沙箱、AGENTS.md 记忆、压缩、规划循环、hooks）；将 Claude Code 作为最成熟的范例。 |
+| [Andrej Karpathy — "Sequoia Ascent 2026"](https://karpathy.bearblog.dev/sequoia-ascent-2026/) | 主张"智能体工程"：人类负责编排与验证，而不再亲自写代码。"LLM 与强化学习自动化的是你能验证的东西"；"你可以外包思考，但无法外包理解"。 |
 
 ### 跨厂商代码智能体工程
 
@@ -502,6 +503,7 @@ Claude Code 回答了每个生产级编码智能体都必须面对的**四个设
 | [**openclaw/openclaw**](https://github.com/openclaw/openclaw) [![Star](https://img.shields.io/github/stars/openclaw/openclaw.svg?style=social&label=Star)](https://github.com/openclaw/openclaw) | 2026 年 1 月 | 跨消息平台的本地优先个人 AI 助手。（[第 10 节分析](#跨系统对比claude-code-vs-openclaw-vs-hermes-agent)） |
 | [**NousResearch/hermes-agent**](https://github.com/nousresearch/hermes-agent) [![Star](https://img.shields.io/github/stars/nousresearch/hermes-agent.svg?style=social&label=Star)](https://github.com/nousresearch/hermes-agent) | 2026 年 2 月 | 具有跨会话记忆的自我改进个人智能体。（[第 10 节分析](#跨系统对比claude-code-vs-openclaw-vs-hermes-agent)） |
 | [**opensquilla/opensquilla**](https://github.com/opensquilla/opensquilla) [![Star](https://img.shields.io/github/stars/opensquilla/opensquilla.svg?style=social&label=Star)](https://github.com/opensquilla/opensquilla) | 2026 年 6 月 | 主打 token 效率的微内核个人智能体，覆盖 CLI、Web UI 与聊天渠道；它用 ML 分类器按成本给模型分档并据此路由，配有本地 Markdown+SQLite 记忆（一个 MEMORY.md 加上按日期记录的笔记，支持关键词与向量召回），并提供 Bubblewrap/Seatbelt 沙箱。 |
+| [**pewdiepie-archdaemon/odysseus**](https://github.com/pewdiepie-archdaemon/odysseus) [![Star](https://img.shields.io/github/stars/pewdiepie-archdaemon/odysseus.svg?style=social&label=Star)](https://github.com/pewdiepie-archdaemon/odysseus) | 2026 年 6 月 | PewDiePie 推出的自托管、本地优先 AI 工作台：带工具、MCP 与 shell 访问的自主智能体，外加记忆、深度研究与按硬件适配的模型服务。AGPL-3.0。 |
 | [**sst/opencode**](https://github.com/sst/opencode) [![Star](https://img.shields.io/github/stars/sst/opencode.svg?style=social&label=Star)](https://github.com/sst/opencode) | 2025 年 6 月 | 与模型厂商无关的终端编码智能体，集成 ACP。 |
 | [**Aider-AI/aider**](https://github.com/Aider-AI/aider) [![Star](https://img.shields.io/github/stars/Aider-AI/aider.svg?style=social&label=Star)](https://github.com/Aider-AI/aider) | 2023 年 | 在终端中与 LLM 结对编程，支持主流模型。 |
 | [**continuedev/continue**](https://github.com/continuedev/continue) [![Star](https://img.shields.io/github/stars/continuedev/continue.svg?style=social&label=Star)](https://github.com/continuedev/continue) | 2023 年 | IDE 中受版本控制的 AI 检查，配套开源 Continue CLI。 |
@@ -528,6 +530,7 @@ Claude Code 回答了每个生产级编码智能体都必须面对的**四个设
 | [**openai/symphony**](https://github.com/openai/symphony) [![Star](https://img.shields.io/github/stars/openai/symphony.svg?style=social&label=Star)](https://github.com/openai/symphony) | 2026 年 2 月 | OpenAI 的编排方案，用于隔离、自主的实现运行。 |
 | [**ComposioHQ/agent-orchestrator**](https://github.com/ComposioHQ/agent-orchestrator) [![Star](https://img.shields.io/github/stars/ComposioHQ/agent-orchestrator.svg?style=social&label=Star)](https://github.com/ComposioHQ/agent-orchestrator) | 2025 年 | 并行 AI 智能体编排层，含 git worktree 隔离。 |
 | [**coleam00/Archon**](https://github.com/coleam00/Archon) [![Star](https://img.shields.io/github/stars/coleam00/Archon.svg?style=social&label=Star)](https://github.com/coleam00/Archon) | 2025 年 2 月 | 确定性 harness——YAML 定义工作流与执行审计跟踪。 |
+| [**bytedance/deer-flow**](https://github.com/bytedance/deer-flow) [![Star](https://img.shields.io/github/stars/bytedance/deer-flow.svg?style=social&label=Star)](https://github.com/bytedance/deer-flow) | 2026 年 | 字节跳动的长程"SuperAgent" harness：子智能体、记忆、沙箱、技能与消息网关；基于 LangGraph/LangChain 的彻底重写。 |
 
 ### 记忆与持久化上下文
 
