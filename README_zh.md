@@ -285,11 +285,11 @@ Claude Code 回答了每个生产级编码智能体都必须面对的**四个设
 <details>
 <summary><h2>Agent 设计空间的新信号</h2></summary>
 
-这些 agent 系统的新进展进一步强化了 Claude Code 暴露出的同一个判断：agent 能力不只是模型属性，而是由模型周围的运行时、context 层、执行边界、工具供应链、人类控制面和评估闭环共同产生。
+这些 agent 系统的新进展进一步强化了 Claude Code 揭示的同一个判断：agent 能力不只是模型属性，而是由模型周围的运行时、context 层、执行边界、工具供应链、人类对它的控制和评估闭环共同产生。
 
 | 设计启示 | 对 Agent 构建者意味着什么 | 代表信号 |
 |:---|:---|:---|
-| **运行时与控制面是一等设计关注点** | 持久执行、检查点、沙箱、agent inventory、策略面和可观测性应该作为用户可感知的系统界面来设计，而不是隐藏在部署管线里。 | [Cursor cloud agents](https://cursor.com/blog/cloud-agent-lessons)、[Google Managed Agents](https://blog.google/innovation-and-ai/technology/developers-tools/managed-agents-gemini-api/)、[Microsoft Agent 365](https://www.microsoft.com/en-us/security/blog/2026/05/01/microsoft-agent-365-now-generally-available-expands-capabilities-and-integrations/) |
+| **运行时与控制面是一等设计关注点** | 持久执行、检查点、沙箱、agent inventory、策略面和可观测性应该作为用户可感知的系统界面来设计，而不是隐藏在部署管线里。 | [Cursor cloud agents](https://cursor.com/blog/cloud-agent-lessons)、[Google Managed Agents](https://blog.google/innovation-and-ai/technology/developers-tools/managed-agents-gemini-api/)、[Microsoft Agent 365](https://www.microsoft.com/en-us/security/blog/2026/05/01/microsoft-agent-365-now-generally-available-expands-capabilities-and-integrations/)、[Databricks Omnigent](https://www.databricks.com/blog/introducing-omnigent-meta-harness-combine-control-and-share-your-agents) |
 | **Context 是有生命周期的基础设施** | Prompt、文件、skills、IDE 索引、workspace state、memory namespace 和 interpreter state 都需要生命周期、来源、审查和回滚。 | [LangChain Context Hub](https://www.langchain.com/blog/introducing-context-hub)、[AWS AgentCore](https://aws.amazon.com/blogs/machine-learning/break-the-context-window-barrier-with-amazon-bedrock-agentcore/)、[Anthropic managed-agent memory](https://platform.claude.com/docs/en/managed-agents/memory) |
 | **执行边界就是安全边界** | 权限、网络可达性、文件系统访问、凭证托管、租户隔离和 OS sandboxing 是核心架构，而不是后期加固项。 | [Codex Windows sandbox](https://openai.com/index/building-codex-windows-sandbox/)、[Running Codex safely](https://openai.com/index/running-codex-safely/)、[Anthropic self-hosted sandboxes](https://platform.claude.com/docs/en/managed-agents/self-hosted-sandboxes) |
 | **工具与 skills 构成供应链** | MCP servers、skills、plugins 和 agent-to-agent protocols 需要 registry、allowlist、identity、语义审查、版本管理和撤销机制。 | [NSA MCP security](https://www.nsa.gov/Portals/75/documents/Cybersecurity/CSI_MCP_SECURITY.pdf)、[GitHub MCP allowlists](https://github.blog/changelog/2026-04-16-copilot-cli-supports-custom-registry-based-mcp-allowlists/)、[A2A milestone](https://www.linuxfoundation.org/press/a2a-protocol-surpasses-150-organizations-lands-in-major-cloud-platforms-and-sees-enterprise-production-use-in-first-year) |
@@ -455,6 +455,7 @@ Claude Code 回答了每个生产级编码智能体都必须面对的**四个设
 | [WaveSpeed — "Claude Code Architecture: Leaked Source Deep Dive"](https://wavespeed.ai/blog/posts/claude-code-architecture-leaked-source-deep-dive/) | 512K 行 TS 源码深度剖析；上下文压缩和反蒸馏。 |
 | [Zain Hasan — "Inside Claude Code: An Architecture Deep Dive"](https://zainhas.github.io/blog/2026/inside-claude-code-architecture/) | 分层架构、5 种入口模式、多智能体演练。 |
 | [Addy Osmani — "Agent Harness Engineering"](https://addyosmani.com/blog/agent-harness-engineering/) | 把 harness engineering 视为一门工程学科，给出命名化的原语（文件系统/git 状态、沙箱、AGENTS.md 记忆、压缩、规划循环、hooks）；将 Claude Code 作为最成熟的范例。 |
+| [Addy Osmani — "Loop Engineering"](https://addyosmani.com/blog/loop-engineering/) | 给 "loop engineering" 命名的那篇：你不再亲自给智能体写 prompt，而是搭一个自动去 prompt 它的循环。它的几个部分（自动化任务、worktree、skills、连接器、子智能体，以及一个记录进度的文件）就是本文分析的 harness 层。 |
 | [Andrej Karpathy — "Sequoia Ascent 2026"](https://karpathy.bearblog.dev/sequoia-ascent-2026/) | 主张"智能体工程"：人类负责编排与验证，而不再亲自写代码。"LLM 与强化学习自动化的是你能验证的东西"；"你可以外包思考，但无法外包理解"。 |
 
 ### 跨厂商代码智能体工程
@@ -524,6 +525,7 @@ Claude Code 回答了每个生产级编码智能体都必须面对的**四个设
 |:-----------|:-------|:------|
 | [**geekan/MetaGPT**](https://github.com/geekan/MetaGPT) [![Star](https://img.shields.io/github/stars/geekan/MetaGPT.svg?style=social&label=Star)](https://github.com/geekan/MetaGPT) | 2023 年 | 角色分工的多智能体软件公司模拟（ICLR 2024 oral）。 |
 | [**microsoft/autogen**](https://github.com/microsoft/autogen) [![Star](https://img.shields.io/github/stars/microsoft/autogen.svg?style=social&label=Star)](https://github.com/microsoft/autogen) | 2023 年 | 微软研究院多智能体对话框架（COLM 2024）。 |
+| [**microsoft/agent-framework**](https://github.com/microsoft/agent-framework) [![Star](https://img.shields.io/github/stars/microsoft/agent-framework.svg?style=social&label=Star)](https://github.com/microsoft/agent-framework) | 2025 年 | 微软整合 AutoGen 与 Semantic Kernel 的后继框架（2026 年 4 月发布 1.0）。在 BUILD 2026 上加入了内置的 agent harness（上下文压缩、文件记忆、shell）和 CodeAct：让模型把多次工具调用写成一段 Python 一次跑完，而不是一次只调一个。 |
 | [**langchain-ai/langgraph**](https://github.com/langchain-ai/langgraph) [![Star](https://img.shields.io/github/stars/langchain-ai/langgraph.svg?style=social&label=Star)](https://github.com/langchain-ai/langgraph) | 2024 年 | 基于状态图的多智能体编排，含检查点。 |
 | [**openai/openai-agents-python**](https://github.com/openai/openai-agents-python) [![Star](https://img.shields.io/github/stars/openai/openai-agents-python.svg?style=social&label=Star)](https://github.com/openai/openai-agents-python) | 2024 年 | OpenAI 轻量多智能体框架，含 handoff 与 guardrail。 |
 | [**crewAIInc/crewAI**](https://github.com/crewAIInc/crewAI) [![Star](https://img.shields.io/github/stars/crewAIInc/crewAI.svg?style=social&label=Star)](https://github.com/crewAIInc/crewAI) | 2023 年 | 精简 Python 框架，角色化多智能体协作，独立于 LangChain。 |
@@ -531,6 +533,9 @@ Claude Code 回答了每个生产级编码智能体都必须面对的**四个设
 | [**ComposioHQ/agent-orchestrator**](https://github.com/ComposioHQ/agent-orchestrator) [![Star](https://img.shields.io/github/stars/ComposioHQ/agent-orchestrator.svg?style=social&label=Star)](https://github.com/ComposioHQ/agent-orchestrator) | 2025 年 | 并行 AI 智能体编排层，含 git worktree 隔离。 |
 | [**coleam00/Archon**](https://github.com/coleam00/Archon) [![Star](https://img.shields.io/github/stars/coleam00/Archon.svg?style=social&label=Star)](https://github.com/coleam00/Archon) | 2025 年 2 月 | 确定性 harness——YAML 定义工作流与执行审计跟踪。 |
 | [**bytedance/deer-flow**](https://github.com/bytedance/deer-flow) [![Star](https://img.shields.io/github/stars/bytedance/deer-flow.svg?style=social&label=Star)](https://github.com/bytedance/deer-flow) | 2026 年 | 字节跳动的长程"SuperAgent" harness：子智能体、记忆、沙箱、技能与消息网关；基于 LangGraph/LangChain 的彻底重写。 |
+| [**QwenLM/Qwen-Agent**](https://github.com/QwenLM/Qwen-Agent) [![Star](https://img.shields.io/github/stars/QwenLM/Qwen-Agent.svg?style=social&label=Star)](https://github.com/QwenLM/Qwen-Agent) | 2023 年 | 阿里 Qwen 的 agent 框架：function calling、MCP、Docker code interpreter、RAG；Qwen Chat 的后端。 |
+| [**TencentCloudADP/youtu-agent**](https://github.com/TencentCloudADP/youtu-agent) [![Star](https://img.shields.io/github/stars/TencentCloudADP/youtu-agent.svg?style=social&label=Star)](https://github.com/TencentCloudADP/youtu-agent) | 2025 年 | 腾讯云基于 openai-agents SDK 的框架；用 YAML 定义 agent、可自动生成配置，并提供 Claude Code 式的 skills。 |
+| [**coze-dev/coze-studio**](https://github.com/coze-dev/coze-studio) [![Star](https://img.shields.io/github/stars/coze-dev/coze-studio.svg?style=social&label=Star)](https://github.com/coze-dev/coze-studio) | 2025 年 | 字节跳动 Coze 的开源版：可视化的 no-code/low-code 平台，用于搭建、调试与部署 agent 和工作流。 |
 
 ### 记忆与持久化上下文
 
