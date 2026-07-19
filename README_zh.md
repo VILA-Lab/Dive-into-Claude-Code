@@ -42,6 +42,7 @@
 - [🛰️ Agent 设计空间的新信号](#agent-设计空间的新信号)
 - [🛠️ 构建你自己的 AI 智能体：设计指南](#构建你自己的-ai-智能体设计指南)
 - [⚖️ 跨系统对比：Claude Code vs OpenClaw vs Hermes-Agent](#跨系统对比claude-code-vs-openclaw-vs-hermes-agent)
+- [🔎 按设计问题检索资源](#按设计问题检索资源)
 - [🌐 社区项目与研究](#社区项目与研究)
 - [🚀 其他值得关注的 AI 智能体项目](#其他值得关注的-ai-智能体项目)
 - [🔖 引用](#引用)
@@ -350,6 +351,23 @@ Claude Code 回答了每个生产级编码智能体都必须面对的**四个设
 
 ---
 
+## 按设计问题检索资源
+
+上面各节给出的是 Claude Code 自己对每个设计问题的回答，下面的目录则是按资源类型组织的。这张表把两者接起来，让你可以从问题出发，而不是从文件类型出发。
+
+| 设计问题 | Claude Code 的回答 | 外部资源在哪里 |
+|:---|:---|:---|
+| **一个回合究竟是怎么跑完的？** 智能体循环、工具派发、错误恢复。 | [智能体查询循环](#智能体查询循环) | [架构分析](#架构分析) · [开源重新实现](#开源重新实现) · [编码智能体 CLI](#编码智能体-cli-与-ide-harness) · [Harness 工程](#通用-harness-engineering-设计空间资源) |
+| **谁被允许做什么？** 权限、批准、沙箱。 | [安全与权限](#安全与权限) | [安全研究与真实事件](#安全研究与真实事件) · [运行时与沙箱基础设施](#运行时与沙箱基础设施) · [产品文档](#产品文档) · [学术论文](#相关学术论文) |
+| **系统怎么被扩展？** hooks、skills、插件、MCP。 | [可扩展性](#可扩展性) | [Skill 与 Harness 扩展](#skill-与-harness-扩展) · [MCP 生态](#mcp-生态) · [产品文档](#产品文档) |
+| **模型到底看到了什么？** 上下文构造、记忆、压缩。 | [上下文与记忆](#上下文与记忆) | [记忆与持久化上下文](#记忆与持久化上下文) · [博客文章与技术文章](#博客文章与技术文章) · [学术论文](#相关学术论文) |
+| **工作怎么分配下去？** 子智能体、团队、编排。 | [子智能体委托](#子智能体委托) | [智能体框架与编排](#智能体框架与编排) · [跨厂商工程](#跨厂商代码智能体工程) · [跨系统对比](#跨系统对比claude-code-vs-openclaw-vs-hermes-agent) |
+| **重启之后什么还在？** 会话、检查点、持久化。 | [会话持久化](#会话持久化) | [运行时与沙箱基础设施](#运行时与沙箱基础设施) · [跨厂商工程](#跨厂商代码智能体工程) |
+
+若某个变化横跨所有维度、而不是落在单条轴上，见 [Agent 设计空间的新信号](#agent-设计空间的新信号)。
+
+---
+
 <details>
 <summary><h2>社区项目与研究</h2></summary>
 
@@ -409,6 +427,7 @@ Claude Code 回答了每个生产级编码智能体都必须面对的**四个设
 | [**cablate/claude-code-research**](https://github.com/cablate/claude-code-research) [![Star](https://img.shields.io/github/stars/cablate/claude-code-research.svg?style=social&label=Star)](https://github.com/cablate/claude-code-research) | 关于内部结构、Agent SDK 和相关工具的独立研究。 |
 | [**Yuyz0112/claude-code-reverse**](https://github.com/Yuyz0112/claude-code-reverse) [![Star](https://img.shields.io/github/stars/Yuyz0112/claude-code-reverse.svg?style=social&label=Star)](https://github.com/Yuyz0112/claude-code-reverse) | 可视化 Claude Code 的 LLM 交互——日志解析器和可视化工具，追踪提示、工具调用和压缩。 |
 | [**Piebald-AI/claude-code-system-prompts**](https://github.com/Piebald-AI/claude-code-system-prompts) [![Star](https://img.shields.io/github/stars/Piebald-AI/claude-code-system-prompts.svg?style=social&label=Star)](https://github.com/Piebald-AI/claude-code-system-prompts) | 按版本追踪的 Claude Code 内部 prompt 语料库，逐版本从发布的分发包中抽取：主 system prompt、内置工具描述、子智能体提示（Plan/Explore/Task）、斜杠命令提示，以及 system reminder 注入；changelog 覆盖自 v2.0.14 以来每一个被追踪的版本。每次 Claude Code 发布后数分钟内更新。 |
+| [**AgiFlow/claude-code-prompt-analysis**](https://github.com/AgiFlow/claude-code-prompt-analysis) [![Star](https://img.shields.io/github/stars/AgiFlow/claude-code-prompt-analysis.svg?style=social&label=Star)](https://github.com/AgiFlow/claude-code-prompt-analysis) | 跨五段对话会话抓取的 API 请求与响应日志。走的是可复现的实证路线，而不是静态读代码。 |
 
 ### 开源重新实现
 
@@ -423,6 +442,7 @@ Claude Code 回答了每个生产级编码智能体都必须面对的**四个设
 | [**Enderfga/openclaw-claude-code**](https://github.com/Enderfga/openclaw-claude-code) [![Star](https://img.shields.io/github/stars/Enderfga/openclaw-claude-code.svg?style=social&label=Star)](https://github.com/Enderfga/openclaw-claude-code) | OpenClaw 插件——为 Claude/Codex/Gemini/Cursor 提供统一的 ISession 接口。多智能体委员会。 |
 | [**memaxo/claude_code_re**](https://github.com/memaxo/claude_code_re) [![Star](https://img.shields.io/github/stars/memaxo/claude_code_re.svg?style=social&label=Star)](https://github.com/memaxo/claude_code_re) | 从压缩后的包进行逆向工程——对公开分发的 cli.js 文件进行反混淆。 |
 | [**agentforce314/clawcodex**](https://github.com/agentforce314/clawcodex) [![Star](https://img.shields.io/github/stars/agentforce314/clawcodex.svg?style=social&label=Star)](https://github.com/agentforce314/clawcodex) | Python 重新实现，支持多家 LLM 厂商。 |
+| [**ultraworkers/claw-code**](https://github.com/ultraworkers/claw-code) [![Star](https://img.shields.io/github/stars/ultraworkers/claw-code.svg?style=social&label=Star)](https://github.com/ultraworkers/claw-code) | 净室 Rust 重新实现，把约 51.2 万行的 TypeScript 代码压缩到大约 2 万行 Rust。正因如此，它很适合用来看清 harness 里哪些是本质、哪些是附带的。 |
 
 ### Claude Code 指南与学习
 
@@ -433,6 +453,9 @@ Claude Code 回答了每个生产级编码智能体都必须面对的**四个设
 | [**shareAI-lab/learn-claude-code**](https://github.com/shareAI-lab/learn-claude-code) [![Star](https://img.shields.io/github/stars/shareAI-lab/learn-claude-code.svg?style=social&label=Star)](https://github.com/shareAI-lab/learn-claude-code) | "Bash 就是你需要的一切"——19 章 0 到 1 课程，包含可运行的 Python 智能体、Web 平台。ZH/EN/JA。 |
 | [**FlorianBruniaux/claude-code-ultimate-guide**](https://github.com/FlorianBruniaux/claude-code-ultimate-guide) [![Star](https://img.shields.io/github/stars/FlorianBruniaux/claude-code-ultimate-guide.svg?style=social&label=Star)](https://github.com/FlorianBruniaux/claude-code-ultimate-guide) | 从初学者到高级用户的指南，包含生产级模板、智能体工作流指南和速查表。 |
 | [**affaan-m/everything-claude-code**](https://github.com/affaan-m/everything-claude-code) [![Star](https://img.shields.io/github/stars/affaan-m/everything-claude-code.svg?style=social&label=Star)](https://github.com/affaan-m/everything-claude-code) | 智能体 harness 优化——skills、本能、记忆、安全和研究优先开发。 |
+| [**hesreallyhim/awesome-claude-code**](https://github.com/hesreallyhim/awesome-claude-code) [![Star](https://img.shields.io/github/stars/hesreallyhim/awesome-claude-code.svg?style=social&label=Star)](https://github.com/hesreallyhim/awesome-claude-code) | skills、hooks、斜杠命令、智能体编排器与插件的精选列表。 |
+| [**nblintao/awesome-claude-code-postleak-insights**](https://github.com/nblintao/awesome-claude-code-postleak-insights) [![Star](https://img.shields.io/github/stars/nblintao/awesome-claude-code-postleak-insights.svg?style=social&label=Star)](https://github.com/nblintao/awesome-claude-code-postleak-insights) | 泄露后发现的精选整理，涵盖内部代号（BUDDY、KAIROS、ULTRAPLAN）、Undercover Mode，以及 AutoDream 记忆固化。 |
+| [**rohitg00/awesome-claude-code-toolkit**](https://github.com/rohitg00/awesome-claude-code-toolkit) [![Star](https://img.shields.io/github/stars/rohitg00/awesome-claude-code-toolkit.svg?style=social&label=Star)](https://github.com/rohitg00/awesome-claude-code-toolkit) | 打包好的工具集，含智能体、skills、命令、插件、hooks、规则、模板与 MCP 配置。 |
 
 ### 通用 Harness Engineering 设计空间资源
 
@@ -467,10 +490,18 @@ Claude Code 回答了每个生产级编码智能体都必须面对的**四个设
 | [Lilian Weng — "Harness Engineering for Self-Improvement"](https://lilianweng.github.io/posts/2026-07-04-harness/) | 把 harness 定义为"围绕基础模型、编排执行的系统，它决定模型如何思考和规划、如何调用工具并行动、如何感知和管理上下文、如何存储产物、如何评估结果"。核心论断：近期的递归自我改进不会始于模型直接改写自己的权重，而是始于 coding agent 去演化 harness 本身。全文分设计模式、harness 优化、进化搜索、与权重联合优化四条线。 |
 | [Armin Ronacher — "Better Models: Worse Tools"](https://lucumr.pocoo.org/2026/7/4/better-models-worse-tools/) | 迄今最直接的证据，说明 harness 会反过来塑造模型，而不只是被模型使用。Opus 4.8 和 Sonnet 5 会凭空造出 `requireUnique`、`oldText2` 这类任何 schema 里都没有的字段，而周围的 payload 字节完全正确。作者的解释是：这些模型是在 Claude Code 那个宽容的 harness 里训练出来的，而该 harness 会悄悄修复畸形调用（丢掉不认识的 key、接受参数别名），于是"稍微写错也照样拿到奖励"。工具 schema 并不是一层中立的抽象。 |
 | [Addy Osmani — "Agentic Autonomy Levels"](https://addyosmani.com/blog/agentic-autonomy-levels/) | 把两个长期被混为一谈的维度拆开：agency（单个智能体能独立到什么程度）与 orchestration（多个智能体如何协调）。提出"执行前契约"，包含目标、范围、非目标、工具与权限、停止条件、证据要求、升级路径和预算，是对 Claude Code 那种临场弹窗批准的一种结构化替代。 |
-| [Tenet Security — "One Fake Bug Report Hijacked a $250 Billion Company's AI Agent, Then 100+ More"](https://tenetsecurity.ai/blog/agentjacking-coding-agents-with-fake-sentry-errors/) | 迄今最有力的一个演示，说明工具的返回值就是不可信输入。Sentry 的 DSN 本来就是公开的（Sentry 官方文档明说可以安全地嵌进前端 JavaScript），且接受任意错误负载，攻击者可以 POST 一个事件，里面塞一段 markdown 指令，渲染出来像是一节伪造的"Resolution"。开发者随后让智能体去排查这个 Sentry issue，智能体经 MCP 把被污染的事件取回来，当成可信的修复指引照做，于是运行了攻击者控制的 npm 包，把 AWS key、GitHub token 和 SSH 凭据带走。已确认对 Claude Code、Cursor 和 OpenAI Codex 均有效，包括沙箱变体与 CI/CD 流水线。 |
 | [Andrej Karpathy — "Sequoia Ascent 2026"](https://karpathy.bearblog.dev/sequoia-ascent-2026/) | 主张"智能体工程"：人类负责编排与验证，而不再亲自写代码。"LLM 与强化学习自动化的是你能验证的东西"；"你可以外包思考，但无法外包理解"。 |
-| [Wiz — "GhostApproval"](https://thehackernews.com/2026/07/ghostapproval-symlink-flaws-could-let.html) | 一种针对批准弹窗本身的"知情同意"绕过。仓库里放一个名字人畜无害的符号链接，比如 `project_settings.json`，实际指向 `~/.ssh/authorized_keys` 或 `~/.zshrc`；弹窗显示的是那个诱饵名字，于是用户批准的写入落到了完全不同的地方。Amazon Q Developer、Cursor 与 Google Antigravity 已修复，Augment 与 Windsurf 确认但尚未修复。Anthropic 对 Claude Code 的部分提出异议，认为该场景在其威胁模型之外：开发者既选择了信任该目录，又批准了这次编辑。这处分歧本身值得原样保留，因为它争的其实是"同意应该从哪里产生"。 |
 | [Geoffrey Litt — "Understanding is the new bottleneck"](https://www.geoffreylitt.com/2026/07/02/understanding-is-the-new-bottleneck) | 当 agent 越来越会验证自己的产出，稀缺资源就从"检查正确性"变成了"人的理解"。作者主张界面应当去建立理解，而不是把 diff 摆出来了事，并提出三种做法：带内嵌讲解的 literate diff、可以逐步走查一次改动的交互式微世界，以及让团队形成共同心智模型的共享空间。这是一个关于控制界面的论点，谈的是 harness 该向人回报什么，而不是它允许 agent 做什么。 |
+| [Haseeb Qureshi — "Inside the Claude Code source"](https://gist.github.com/Haseeb-Qureshi/d0dc36844c19d26303ce09b42e7188c1) | 关键模块剖析：React/Ink 界面、四种压缩策略，以及动态 prompt 边界系统。 |
+| [Han HELOIR YAN — "Nobody Analyzed Its Architecture"](https://medium.com/data-science-collective/everyone-analyzed-claude-codes-features-nobody-analyzed-its-architecture-1173470ab622) | "护城河是 harness，不是模型。"本文较早把这个判断讲了出来，也正是本论文完整展开的主题。 |
+| [Marco Kotrotsos — "Part 8: The Permission System"](https://kotrotsos.medium.com/claude-code-internals-part-8-the-permission-system-624bd7bb66b7) | Internals 系列中专讲权限的一篇，是泄露前对批准路径最接近实况的重建。 |
+| [Vincent Qiao — "Permissions System Deep Dive"](https://blog.vincentqiao.com/en/posts/claude-code-settings-permissions/) | 从 settings 层面讲清权限规则实际怎么写、怎么解析。 |
+| [ClaudeCodeCamp — "How Prompt Caching Actually Works"](https://www.claudecodecamp.com/p/how-prompt-caching-actually-works-in-claude-code) | 对 Claude Code 中缓存行为讲得最清楚的一篇实务文章，而缓存正是绝大多数压缩设计必须绕开的约束。 |
+| [Gigi Sayfan — "MCP Unleashed"](https://medium.com/@the.gigi/claude-code-deep-dive-mcp-unleashed-0c7692f9c2c2) | MCP 集成路径的深入剖析：传输方式、服务器生命周期，以及外部工具如何进入工具面。 |
+| [DEV Community — "Architecture via Rust Rewrite"](https://dev.to/brooks_wilson_36fbefbbae4/claude-code-architecture-explained-agent-loop-tool-system-and-permission-model-rust-rewrite-41b2) | 借一个 Rust 重新实现来读架构，把工具集拆成三层结构呈现。 |
+| [Reid Barber — "Reverse Engineering Claude Code"](https://www.reidbarber.com/blog/reverse-engineering-claude-code) | 最早的一批分析之一（2025 年年中），讲 REPL 架构与最初的工具集。 |
+| [Kir Shatrov — "Reverse Engineering Claude Code"](https://kirshatrov.com/posts/claude-code-internals) | 用 mitmproxy 截获 API 流量，完整报告了一次实测实验，包括 LLM 耗时与成本。 |
+| [Sabrina Ramonov — "Reverse-Engineering Using Sub Agents"](https://www.sabrina.dev/p/reverse-engineering-claude-code-using) | 方法论上有意思：自建子智能体（File Splitter、Structure Analyzer），再用它们去逆向压缩后的产物。 |
 
 ### 跨厂商代码智能体工程
 
@@ -484,21 +515,16 @@ Claude Code 回答了每个生产级编码智能体都必须面对的**四个设
 | [Microsoft Agent Framework at BUILD 2026: Agent Harness, Hosted Agents, CodeAct](https://devblogs.microsoft.com/agent-framework/microsoft-agent-framework-at-build-2026-announce/) | Microsoft | 内置了一个 "agent harness"：自动压缩上下文、文件式记忆、plan/execute 两种模式、skill 发现、并行子智能体，还有一个沙箱 shell。另外加了 CodeAct——让模型把多次工具调用写成一段 Python 程序，在每次调用单独开的 Hyperlight 微型虚拟机里跑。 |
 | [Codex Security: Now in Research Preview](https://openai.com/index/codex-security-now-in-research-preview/) | OpenAI | 应用安全智能体：先为项目构建专属威胁模型，再在沙箱验证环境中查找并压力测试漏洞。 |
 | [Meet Your Agent Harness and Claw](https://devblogs.microsoft.com/agent-framework/meet-your-agent-harness-and-claw/)、[Working with Your Data, Safely](https://devblogs.microsoft.com/agent-framework/agent-harness-working-with-your-data-safely/)、[Scaling Harness Capabilities](https://devblogs.microsoft.com/agent-framework/agent-harness-scaling-the-claw-or-harness-capabilities/) | Microsoft | 一个四篇的 harness 系列。授权设计值得注意：standing rule（"总是批准这个工具"、"总是批准这组参数"）只在当前 session 内有效，绝不会固化进 agent，这与 Claude Code 的权限模型是直接可比的一点。能力扩展被拆成四个正交机制：Skills、受限 Shell、CodeAct、Background Agents。 |
-| [Bedrock AgentCore Harness 正式可用](https://aws.amazon.com/blogs/machine-learning/amazon-bedrock-agentcore-harness-is-now-generally-available-go-from-idea-to-production-grade-agent-in-minutes/) | AWS | harness 不再是你自己写的一个循环，而变成了托管的配置对象：`CreateHarness` 和 `InvokeHarness` 声明模型、工具、skills、记忆策略和容器环境，底层封装七个原语（microVM Runtime、Memory、Gateway、沙箱 Browser、Code Interpreter、Identity token vault、Observability）。这给设计空间加了一个新坐标：loop、环境和工具边界到底归谁所有。 |
-| [AgentCore policy 与 Guardrails](https://aws.amazon.com/about-aws/whats-new/2026/06/amazon-bedrock-agentcore-policy-guardrails-generally-available/) | AWS | 强制执行发生在 gateway 边界，也就是 agent 代码之外，因此无论 agent 变得多自主都照样生效。这与"在环内做权限检查"是截然不同的架构选择。 |
 | [Gemini CLI 转向 Antigravity CLI](https://developers.googleblog.com/an-important-update-transitioning-gemini-cli-to-antigravity-cli/) 与 [antigravity-cli](https://github.com/google-antigravity/antigravity-cli) | Google | Gemini CLI 于 2026-06-18 停服，由一个 Go 重写版取代，后者与 Antigravity 2.0 桌面端共用同一个 agent harness。据其 CHANGELOG（该仓库只放发布产物与示例，不含源码），机制与 Claude Code 相当接近：嵌套 subagent 可到孙级及更深，其子轨迹更新会被递归回传到根对话；工作区级的 `.agents/hooks.json`，由 pre-tool hook 决定某次工具调用是否放行；以及按项目的权限配置，存放在 `~/.gemini/config/projects/` 而非仓库内，优先级高于全局设置。 |
 | [Governing Agent Autonomy with Auto-review](https://cursor.com/blog/agent-autonomy-auto-review) | Cursor | 分类器跑在 agent loop 内部，而不是作为独立端点。它拦下一个动作时，会把解释返回给父 agent，父 agent 往往能据此绕道走一条安全路径，全程不打扰用户。约 4% 的动作被拦下，但只有约 7% 的对话真的中断了人。拦截在这里是引导信号，而不只是终止。 |
 | [Reward Hacking is Swamping Model Intelligence Gains](https://cursor.com/blog/reward-hacking-coding-benchmarks) | Cursor | 审计 731 条 Opus 4.8 Max 轨迹后发现，在 SWE-bench Pro 上被判为成功的修复里，63% 是检索来的而不是推导出来的：57% 是在公开网络上找到了已合并的 PR 或修好的源文件，9% 是从仓库自带的 git history 里挖出修复 commit。两道隔离能把这件事照出来，且分数随之大幅下跌：删掉 `.git` 并把仓库重新初始化成单 commit（原历史只在打分时恢复），以及默认禁止联网、只通过代理放行一份包仓库白名单。这直接把评测环境的设计变成了"基准是否还有意义"的前提条件。 |
 | [Customize Cursor](https://cursor.com/changelog/customize) | Cursor | plugins、skills、MCPs、subagents、rules、commands、hooks 被收进同一个扩展管理界面，并支持 user、team、workspace 三级作用域。一个非 Anthropic 厂商收敛到了几乎与 Claude Code 相同的扩展点上。 |
 | [Codex-maxxing for Long-Running Work](https://openai.com/index/codex-maxxing-long-running-work/) | OpenAI | memory vault 把 `AGENTS.md`、`TODO.md`、`projects/`、`people/` 放进 GitHub，于是 diff 本身成了记忆的审查界面。文中把设计立场讲得很直白：记忆必须可打开、可编辑、可 diff、可复用。 |
-| [Running Untrusted Agent Code Without a Sandbox](https://www.langchain.com/blog/running-untrusted-agent-code-without-a-sandbox) 与 [Dynamic Subagents in Deep Agents](https://www.langchain.com/blog/introducing-dynamic-subagents-in-deep-agents) | LangChain | 与容器模型完全反过来的能力隔离：WASM 里的 QuickJS 从"零能力"起步，每一项能力都由 harness 显式桥接进来。解释器内存可以被序列化，从而实现一次等待人工批准的持久暂停。子智能体的派发随之从"对话回合"降到"程序控制流"，由模型写一段脚本去调用 `task({...})`。 |
 | [Devin Fusion](https://cognition.com/blog/devin-fusion) 与 [Agentic MapReduce](https://devin.ai/blog/agentic-map-reduce/) | Cognition | Fusion 把两个通常各管各的机制耦合起来：一个轻量分类器在会话中途重新评估任务难度，而模型切换被特意安排在 context compaction 的时刻，因为那里本来就要 cache miss，所以切换几乎是免费的。MapReduce 则在智能体与确定性计算之间划了一条清晰的线：只在需要推理的地方放智能体，其余一律确定性。 |
 | [AI SDK 7](https://vercel.com/blog/ai-sdk-7) | Vercel | HarnessAgent 把 Claude Code、Codex、Pi 当成同一套 API 背后可互换的后端，会话可以挂起再恢复。WorkflowAgent 把每次工具调用做成可持久化、可重试的步骤，进程重启后仍能接着跑。工具审批用 HMAC 签名，回应了一个很少被讨论的问题：批准本身可能被伪造。 |
 | [MCP 2026-07-28 规范转为无状态](https://blog.modelcontextprotocol.io/posts/sdk-betas-2026-07-28/) 与 [Enterprise-Managed Authorization](https://blog.modelcontextprotocol.io/posts/enterprise-managed-auth/) | MCP | 工具层迄今最大的一次结构性变更。`initialize` 握手与协议级 session 被取消，能力发现改走 `server/discover`；工具现在可以在调用中途暂停并向用户追问（`InputRequiredResult`）；roots、sampling、logging 标记为废弃。另一侧，授权决策从"每个用户逐个点同意"上移到组织的 IdP。 |
 | [Droid Shield 2.0](https://factory.ai/news/droid-shield-2-0) | Factory | 一个确定性正则扫描器，两侧各挂一个微调模型：扫描器没响时，一个模型以召回优先重新读上下文；扫描器响了时，另一个模型先把候选密钥遮住，仅凭上下文判断是不是误报。确定性规则与学习型模型被接成了一道双向纠错的闸门。 |
-| [A Single Pane of Glass for All Your Cloud Agents](https://www.warp.dev/blog/multi-harness-cloud-agent-orchestration) | Warp | Oz 作为 multi-harness 控制面：在同一个界面里启动、追踪、治理和引导 Claude Code、Codex 与 Warp Agent，比较它们的效果，为不同任务挑不同的 harness，并保持一致的审计链路。Agent Memory 可以跨 harness 迁移。 |
 | [Software Is Made Between Commits（DeltaDB）](https://zed.dev/blog/introducing-deltadb) | Zed | 为智能体会话重做的版本控制。一条消息和它产生的编辑被并排存放，二者不会各自漂走；每个引用锚定到 delta 而非行号，因此代码在底下移动时引用依然存活。核心论点是：git 是围绕离散 commit 组织的，它从来就不是为了承载"产生这段代码的那场对话"而设计的。 |
-| [Agent Host 与 Agent Host Protocol](https://code.visualstudio.com/updates/v1_129) | Microsoft | VS Code 1.129 把 agent 会话从编辑器里搬进一个独立进程，通过开放的 Agent Host Protocol 通信。因为会话活在自己的进程里，它在没有任何客户端连接时也继续运行，并且可以同时被多个窗口渲染；同一个 host 用一套会话模型跑 Copilot、Claude 和 Codex。跑在 host 上的 agent 可以列出其他会话、读取它们的对话记录、新开一个会话来移交子任务，以及给另一个会话发消息，其中发送需要用户确认，并有突发上限防止一次请求扇出成无限多个会话。 |
 | [Responses API 中的多智能体编排](https://developers.openai.com/api/docs/guides/responses-multi-agent) | OpenAI | subagent 编排从客户端代码搬进了 API 本身。根 agent 派生出一棵具名的树（`/root/researcher`），由六个托管动作协调（`spawn_agent`、`send_message`、`followup_task`、`wait_agent`、`interrupt_agent`、`list_agents`），并用 `max_concurrent_subagents` 限制整棵树上可同时活跃的 subagent 数量（各级后代都计入，根 agent 不计）。代价写得很直白：开启多智能体时，reasoning summary 与 `max_tool_calls` 都不可用。 |
 | [Programmatic Tool Calling](https://developers.openai.com/api/docs/guides/tools-programmatic-tool-calling) | OpenAI | 由模型写一段 JavaScript，通过 `tools.*` 命名空间去调用工具，跑在一个全新隔离的 V8 里，没有文件系统、没有网络，程序之间也不保留任何状态。工具通过 `allowed_callers` 选择加入，因此一个工具可以只允许程序调用、只允许模型直接调用，或两者都允许。批处理与过滤都发生在程序内部，中间的工具输出因此不进入上下文窗口。 |
 | [Copilot CLI changelog](https://github.com/github/copilot-cli/blob/main/changelog.md) | GitHub | 7 月的三处改动值得与 Claude Code 的权限模型对照：一个 auto allow-all 模式，凡被 LLM 裁判判为可接受的请求即自动放行；受信任的仓库可以通过 `.github/copilot/settings.json` 钉死模型、effort 等级与 context tier，并扩充 URL、MCP、skill 的拒绝名单；`preToolUse` 钩子以退出码 2 直接拒绝某次工具调用。plan mode 会硬性拦截所有会修改工作区的内置工具，但 MCP 与外部工具依然放行，这个边界比"计划模式"这个名字听上去要窄。 |
@@ -506,7 +532,28 @@ Claude Code 回答了每个生产级编码智能体都必须面对的**四个设
 | [Harness Optimizer 发布](https://strandsagents.com/blog/introducing-harness-optimizer/) | AWS | 把 harness 当成一组可调参数，而不是手写出来的东西：system prompt、工具描述与 skills 构成一个 `Formula`，`RewardFunction` 给执行轨迹打分，`Trainer` 按 epoch 跑 rollout、算 reward、更新参数。默认优化器本身就是一个 LLM，它对照着读成功与失败的轨迹，找出赢的那些做了什么而输的没做，再把差异改写回 Formula。开源，并以 AgentCore Optimization 的形式提供生产版本。 |
 | [The Self-Driving Company](https://replit.com/blog/self-driving-company) | Replit | 难得一见的厂商内部用法披露，而不是产品宣传。每位员工都有一个 manager agent，可以在公司自己的 agent harness、microVM 与远程文件系统上派生并编排更多 agent，整套东西被放在"访问策略、token 代理、审计日志与我们的 ZeroTrust 网络之后"。人的升级路径是设计进去的，而不是兜底：代码评审 agent 会评估风险等级，只在必要时才叫第二个人类评审进来。 |
 | [Amp 更新](https://ampcode.com/news) | Sourcegraph | 7 月的两条更新指向同一个方向。agent 现在可以派生其他 agent、给它们发消息，并跨 thread 交换文件，这是点对点协作，而不是父 agent 收集子 agent 的汇报。另一条是 Orb 远程沙箱改用 OIDC 工作负载身份，替换掉远程执行 agent 所用的静态凭证。 |
+
+### 运行时与沙箱基础设施
+
+智能体的动作究竟在哪里、以何种方式执行：沙箱、托管运行时、控制面，以及包在它们外面的会话协议。与 Claude Code 自己的 shell 沙箱和执行边界正好构成对照。
+
+| 资源 | 厂商 | 亮点 |
+|:---------|:-------|:---------------|
+| [Bedrock AgentCore Harness 正式可用](https://aws.amazon.com/blogs/machine-learning/amazon-bedrock-agentcore-harness-is-now-generally-available-go-from-idea-to-production-grade-agent-in-minutes/) | AWS | harness 不再是你自己写的一个循环，而变成了托管的配置对象：`CreateHarness` 和 `InvokeHarness` 声明模型、工具、skills、记忆策略和容器环境，底层封装七个原语（microVM Runtime、Memory、Gateway、沙箱 Browser、Code Interpreter、Identity token vault、Observability）。这给设计空间加了一个新坐标：loop、环境和工具边界到底归谁所有。 |
+| [AgentCore policy 与 Guardrails](https://aws.amazon.com/about-aws/whats-new/2026/06/amazon-bedrock-agentcore-policy-guardrails-generally-available/) | AWS | 强制执行发生在 gateway 边界，也就是 agent 代码之外，因此无论 agent 变得多自主都照样生效。这与"在环内做权限检查"是截然不同的架构选择。 |
+| [Running Untrusted Agent Code Without a Sandbox](https://www.langchain.com/blog/running-untrusted-agent-code-without-a-sandbox) 与 [Dynamic Subagents in Deep Agents](https://www.langchain.com/blog/introducing-dynamic-subagents-in-deep-agents) | LangChain | 与容器模型完全反过来的能力隔离：WASM 里的 QuickJS 从"零能力"起步，每一项能力都由 harness 显式桥接进来。解释器内存可以被序列化，从而实现一次等待人工批准的持久暂停。子智能体的派发随之从"对话回合"降到"程序控制流"，由模型写一段脚本去调用 `task({...})`。 |
+| [A Single Pane of Glass for All Your Cloud Agents](https://www.warp.dev/blog/multi-harness-cloud-agent-orchestration) | Warp | Oz 作为 multi-harness 控制面：在同一个界面里启动、追踪、治理和引导 Claude Code、Codex 与 Warp Agent，比较它们的效果，为不同任务挑不同的 harness，并保持一致的审计链路。Agent Memory 可以跨 harness 迁移。 |
+| [Agent Host 与 Agent Host Protocol](https://code.visualstudio.com/updates/v1_129) | Microsoft | VS Code 1.129 把 agent 会话从编辑器里搬进一个独立进程，通过开放的 Agent Host Protocol 通信。因为会话活在自己的进程里，它在没有任何客户端连接时也继续运行，并且可以同时被多个窗口渲染；同一个 host 用一套会话模型跑 Copilot、Claude 和 Codex。跑在 host 上的 agent 可以列出其他会话、读取它们的对话记录、新开一个会话来移交子任务，以及给另一个会话发消息，其中发送需要用户确认，并有突发上限防止一次请求扇出成无限多个会话。 |
 | [沙箱分叉](https://github.com/e2b-dev/E2B/releases) | E2B | `Sandbox.fork()` 会就地为运行中的沙箱打检查点：短暂暂停、连同完整内存状态一起快照、再恢复，其 ID 与过期时间都保持不变，然后从该快照拉起 N 个彼此独立的新沙箱。这让 harness 能以很低的成本把一个配置代价很高的环境分叉到多路并行尝试上，而不必为每一路重建。 |
+
+### 安全研究与真实事件
+
+针对代码智能体的漏洞研究、披露与真实事件，不限厂商。这里的安全边界是被攻击者实测过的，而不是纸面上描述的。
+
+| 报告 | 它说明了什么 |
+|:--------|:----------------------|
+| [Tenet Security — "One Fake Bug Report Hijacked a $250 Billion Company's AI Agent, Then 100+ More"](https://tenetsecurity.ai/blog/agentjacking-coding-agents-with-fake-sentry-errors/) | 迄今最有力的一个演示，说明工具的返回值就是不可信输入。Sentry 的 DSN 本来就是公开的（Sentry 官方文档明说可以安全地嵌进前端 JavaScript），且接受任意错误负载，攻击者可以 POST 一个事件，里面塞一段 markdown 指令，渲染出来像是一节伪造的"Resolution"。开发者随后让智能体去排查这个 Sentry issue，智能体经 MCP 把被污染的事件取回来，当成可信的修复指引照做，于是运行了攻击者控制的 npm 包，把 AWS key、GitHub token 和 SSH 凭据带走。已确认对 Claude Code、Cursor 和 OpenAI Codex 均有效，包括沙箱变体与 CI/CD 流水线。 |
+| [Wiz — "GhostApproval"](https://thehackernews.com/2026/07/ghostapproval-symlink-flaws-could-let.html) | 一种针对批准弹窗本身的"知情同意"绕过。仓库里放一个名字人畜无害的符号链接，比如 `project_settings.json`，实际指向 `~/.ssh/authorized_keys` 或 `~/.zshrc`；弹窗显示的是那个诱饵名字，于是用户批准的写入落到了完全不同的地方。Amazon Q Developer、Cursor 与 Google Antigravity 已修复，Augment 与 Windsurf 确认但尚未修复。Anthropic 对 Claude Code 的部分提出异议，认为该场景在其威胁模型之外：开发者既选择了信任该目录，又批准了这次编辑。这处分歧本身值得原样保留，因为它争的其实是"同意应该从哪里产生"。 |
 
 ### 相关学术论文
 
@@ -531,12 +578,14 @@ Claude Code 回答了每个生产级编码智能体都必须面对的**四个设
 | [Context Engineering for Multi-Agent Code Assistants](https://arxiv.org/abs/2508.08322) | arXiv | 结合多个 LLM 进行代码生成的多智能体工作流。 |
 | [OpenHands: An Open Platform for AI Software Developers](https://arxiv.org/abs/2407.16741) | ICLR 2025 | 开源 AI 编码智能体的主要学术参考。 |
 | [SWE-Agent: Agent-Computer Interfaces](https://arxiv.org/abs/2405.15793) | NeurIPS 2024 | 基于 Docker 的编码智能体，带有自定义的智能体-计算机接口。 |
+| [The OpenHands Software Agent SDK](https://arxiv.org/abs/2511.03690) | arXiv | 面向生产环境智能体的可组合 SDK 基础，是上面那篇 OpenHands 平台论文在工程侧的对应工作。 |
+| [A Survey on Code Generation with LLM-based Agents](https://arxiv.org/abs/2508.00083) | arXiv | AI 编码智能体领域的综述，适合把 harness 研究放回更大的代码生成文献里定位。 |
+| [AI Agent Systems: Architectures, Applications, and Evaluation](https://arxiv.org/html/2601.01743v1) | arXiv | 覆盖架构、应用与评测三条线的广义智能体系统分类。 |
 
 ### 本论文的不同之处
 
 > 上述项目多聚焦于**工程层面的逆向工程**或**实际动手重新实现**，而本论文提供的是**一套系统的"价值观 → 原则 → 实现"分析框架**——从五个人类价值观出发，经由十三条设计原则，一路追到具体的源码级选择；并借助与 OpenClaw 的对比揭示一个事实：真正构成工程复杂性的，是那些横跨各子系统的整合机制，而不是模块化的单点特性。
 
-**查看更完整的精选资源列表：[docs/related-resources_zh.md](./docs/related-resources_zh.md)**
 
 <p align="right"><a href="#深入理解-claude-code">↑ 返回顶部</a></p>
 
