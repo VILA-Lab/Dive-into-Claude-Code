@@ -2,17 +2,351 @@
 
 # Agent Systems Design Space: Source Notes
 
-Updated September 15, 2026.
+Updated October 6, 2026.
 
 These notes explain the mechanisms, implementation choices, and version-specific conditions behind the [resource catalog](../README.md) and [design guide](./build-your-own-agent.md). [中文版](./agent-design-space-source-notes_zh.md).
 
-Historical source notes through September 7, 2026 follow the current section.
+Historical source notes through September 15, 2026 follow the current section.
 
 <a id="writing-conventions"></a>
 
+<a id="refresh-2026-10-06"></a>
+
+## Agent design sources: October 6, 2026
+
+Dates are in 2026 unless stated otherwise; release timestamps use UTC. ArXiv papers are preprints, and experimental results are those reported by their authors; vendor figures have not been independently checked. The Claude Code architecture analysis covers v2.1.88; newer versions below describe later changes.
+
+<a id="refresh-2026-10-06-graph"></a>
+
+### Work graphs and control loops
+
+<a id="source-cursor-rollouts-verdicts"></a>
+
+#### Cursor Rollouts: check a change after it deploys
+
+**September 23, changelog entry for Teams and Enterprise.** [Changelog entry](https://cursor.com/changelog/rollouts-and-security-reviewer)
+
+When a pull request opens, Rollouts posts a monitoring plan that the author can edit: risks, the intended effect, the signals to check, and missing instrumentation. On each deploy it gives a separate verdict for each environment: healthy, regression, or inconclusive. On a regression, depending on configuration, it can open a revert PR for review or hand the finding to a cloud agent, but it does not merge or roll back on its own. Keeping "inconclusive" as a verdict stops missing evidence from counting as a pass.
+
+<a id="source-adk-abort-resume"></a>
+
+#### Google ADK: abort, approval pause, and rerun on resume
+
+**October 1, ADK Python 2.11.0; related change in 2.9.0, September 10.** [v2.11.0 release notes](https://github.com/google/adk-python/releases/tag/v2.11.0) · [v2.9.0 release notes](https://github.com/google/adk-python/releases/tag/v2.9.0)
+
+ADK Python 2.11.0 lets an abort signal stop a Runner, workflow, or node gracefully, and tool nodes in a workflow now pause for user approval instead of passing an error downstream. Since 2.9.0, released September 10, a failed node reruns when the workflow resumes; before that it was replayed as completed. The release notes therefore ask for idempotent node bodies, because a node that performs a side effect and then fails repeats that effect on every resume. These notes cover ADK Python only.
+
+<a id="source-subgoal-authorization"></a>
+
+#### Subgoal authorization: treat replanning as a change of authority
+
+**October 4, arXiv v1.** [Paper](https://arxiv.org/abs/2610.04975v1)
+
+Zhu and Wang treat creating, replacing, delegating, or joining a subgoal as an authorization event. Each change needs a structured check, bound to the current policy and state version, that the new continuation stays within the approved task; protected effects are checked again at commit. Per-call permission checks miss this, because two individually allowed actions can together violate the task. The evaluation uses finite structured domains and synthetic cases, so this is a research prototype, not a deployed control.
+
+<a id="source-opencollab-adherence"></a>
+
+#### OpenCollab: does the declared organization actually run?
+
+**September 29, arXiv v1.** [Paper](https://arxiv.org/abs/2609.38345v1)
+
+OpenCollab uses the event record to measure whether a declared multi-agent organization, with its role boundaries and communication topology, actually happens at run time. With unconstrained defaults, 47.2% of runs followed the declared structure; lead agents spent the budget themselves instead of delegating, or bypassed teammates. Restricting tool boundaries raised this above 90%, although task success fell in the read-only setting. A topology in the configuration is a request, so check the event record before attributing results to it.
+
+<a id="source-claude-loop-wakeups"></a>
+
+#### Claude Code: loop wakeups are runtime state
+
+**September 23 to October 5, v2.1.281 to v2.1.290.** [CHANGELOG](https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md) · [v2.1.290](https://github.com/anthropics/claude-code/releases/tag/v2.1.290)
+
+These releases fix how `/loop` wakeups and scheduled tasks survive compaction, resume, hand-off to the background, updates, and container restarts. Since v2.1.284, self-paced loops write each status update and the stop outcome as visible text. A pending wakeup has its own lifetime and can be lost or duplicated at each of these boundaries. The source is release notes, not a design document.
+
+<a id="refresh-2026-10-06-runtime"></a>
+
+### Runtime and coordination
+
+<a id="source-claude-stop-scopes"></a>
+
+#### Claude Code: stopping a turn versus stopping background work
+
+**September 17 to October 5, v2.1.275 to v2.1.290.** [CHANGELOG](https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md) · [v2.1.281](https://github.com/anthropics/claude-code/releases/tag/v2.1.281)
+
+In v2.1.275, the send-now key (ctrl+enter, which sends queued messages while Claude is still working) interrupted the current turn; from v2.1.281 it moves running tools to the background instead of cancelling the turn. In the VS Code extension, Stop and Escape end only the current turn; background agents keep running and can be stopped one by one from the agent map (v2.1.286). Background shell commands gained a time limit in v2.1.285 (default 30 minutes, maximum 2 hours), and from v2.1.288 it applies only to unattended sessions such as `-p`, the Agent SDK, CI, and cloud sessions. From v2.1.287, replies from `claude agents` arrive as queued messages and slash commands other than `/stop` run when the current turn ends, although v2.1.290 applies `/model`, `/effort`, and `/rename` at once to a busy background session.
+
+<a id="source-vscode-remote-agent-hosts"></a>
+
+#### VS Code 1.140: delegate to remote agent hosts
+
+**September 30, VS Code 1.140; experimental and off by default.** [Release notes](https://code.visualstudio.com/updates/v1_140)
+
+New tools let an agent list connected remote agent hosts with their capacity and session load, start a session on a named host or on one that meets operating system, memory, and CPU requirements, check its status, and exchange messages. A remote session has no workspace unless one is named, the tools do not copy the originating workspace, and normal approvals still apply. Remote agents report back with `send_remote_message`; their final answers are not forwarded automatically, and the coordinating window must stay open for messages to flow. The release also raises orchestration limits, and reaching one blocks new orchestration actions without interrupting running work.
+
+<a id="source-copilot-dynamic-workflows"></a>
+
+#### Copilot dynamic workflows: limits, pause, and resume
+
+**October 1, public preview.** [Changelog](https://github.blog/changelog/2026-10-01-dynamic-workflows-in-copilot-cli-and-the-copilot-app) · [Concepts](https://docs.github.com/en/copilot/concepts/agents/dynamic-workflows)
+
+In Copilot CLI, the Copilot app, and the Copilot SDK, a workflow is code that defines the steps, when agents are involved, and how their results are used. Reaching the concurrency limit makes new agents wait; the limits on total agents, active running time, and approximate AI credits stop the run but keep its status and saved results, and a raised limit still counts usage from before the stop. On resume, saved results from completed steps and subagents can be reused, while unsaved work may run again. Workflow subagents inherit the session's permission grants, so a session-long grant made for one subagent applies to the others.
+
+<a id="source-exactly-once-tool-contract"></a>
+
+#### Exactly-once: which layer prevents duplicate writes
+
+**September 24, arXiv v1.** [Paper](https://arxiv.org/abs/2609.29095v1)
+
+This study, *Where Does Exactly-Once Live?*, injects faults at tool boundaries, such as a write that commits after the agent has stopped waiting for it, or a request delivered twice, and grades each episode against a ledger of committed effects, including runs under GitHub Copilot CLI, Hermes, and Codex CLI. The author reports that frontier models told to act exactly once almost never duplicated a write whose acknowledgement was lost, but often duplicated requests still in flight or delivered twice; offering an idempotency key on every write cut duplicates from 28% to 4%, and the three harnesses behaved almost the same. In 90% of episodes that produced a duplicate, the agent reported the task as completed. These are single-author results on a synthetic benchmark, and the paper says code and data will be released on publication.
+
+<a id="source-planarian-statepoints"></a>
+
+#### Planarian: one restore point for local and remote state
+
+**September 28, arXiv v1.** [Paper](https://arxiv.org/abs/2609.35366v1) · [StateFork](https://arxiv.org/abs/2609.38648v1)
+
+Planarian is a research prototype whose statepoints cover a sandbox's files and processes together with remote changes made through MCP. It takes incremental local checkpoints and records a compensating action for each remote call; rollback applies those actions in reverse order and restores the local snapshot, and fork creates isolated branches. Remote requests that cannot be made compensable are rejected before they run, and compensation is implemented only for SQL operations on a database MCP server. StateFork (arXiv, September 29) studies how to branch and restore terminal sessions so an agent can explore alternatives.
+
+<a id="source-codex-queued-reconnect"></a>
+
+#### Codex CLI: resolve uncertain sends before resending
+
+**September 29 and October 1, Codex CLI 0.159.0 and 0.160.0.** [0.160.0 release notes](https://github.com/openai/codex/releases/tag/rust-v0.160.0) · [0.159.0 release notes](https://github.com/openai/codex/releases/tag/rust-v0.159.0)
+
+After a reconnection, Codex CLI 0.160.0 resumes unsent queued messages only once submissions with an uncertain outcome have been resolved, so they are not sent twice. Version 0.159.0 adds an opt-in `instant_interrupt` setting that lets new input steer Codex during a model response or a long-running code-mode call.
+
+<a id="refresh-2026-10-06-harness"></a>
+
+### Harness and application interfaces
+
+<a id="source-agents-api-computer-use"></a>
+
+#### Agents API computer use: origin approval and sign-in
+
+**September 29, Agents API public beta.** [API changelog](https://developers.openai.com/api/docs/changelog) · [Computer use guide](https://developers.openai.com/api/docs/guides/agents-api/tools/computer-use)
+
+OpenAI added computer use to the Agents API, with the browser running in an OpenAI-hosted environment. Each new website origin needs user approval, separate from the environment's network policy, and origin approval does not confirm individual actions such as a purchase. Sign-in values go through a dedicated event that stays outside the model's input and session history, and only the main agent, not a subagent, can request sign-in. After a disconnect, the application rereads the session's required actions instead of resending the task or approvals.
+
+<a id="source-cursor-token-efficiency"></a>
+
+#### Cursor: remove harness work the model no longer needs
+
+**September 23, engineering article.** [Article](https://cursor.com/blog/improved-token-efficiency)
+
+Cursor reports a 7% cut in user token costs from harness changes without reducing agent quality; it describes A/B testing individual changes on production traffic. As models improved, it removed about 66% of the system prompt, loaded rarely used built-in tools on demand, placed cache breakpoints after the parts of each request that rarely change, and dropped instructions that pushed subagent use because newer models had learned that pattern in training. The figures are vendor-reported, and the article does not publish its evaluation details.
+
+<a id="source-harness-design-components"></a>
+
+#### Harness components: value depends on the model and context budget
+
+**September 17, arXiv v1; related study September 30.** [Paper](https://arxiv.org/abs/2609.20804v1) · [ML engineering study](https://arxiv.org/abs/2609.40303v1)
+
+The study holds a coding harness's loop fixed and varies planning, action space, and context management across four open models, four context budgets, and 176 settings on SWE-Bench Verified and Terminal-Bench 2.1. Context management mattered most under tight budgets, mainly by preventing overflow; trimming stale tool output before LLM summarization matched the other managed strategies in success and had the lowest cost in seven of eight model and benchmark panels, and a recall tool for trimmed output was rarely used. Planning raised accuracy for weaker models but mainly cut cost for stronger ones; each setting ran once, and closed frontier models were not tested. A September 30 study on machine-learning engineering tasks found that four open-source harnesses gave no advantage over a minimal coding-agent session with the same strong backbone, while weaker backbones still benefited from workflow priors.
+
+<a id="source-zcode-shared-runtime"></a>
+
+#### ZCode: three interfaces built on one repository's agent runtime
+
+**September 2026, source release; earliest public commit September 20, README notes v3.14.3 on September 23.** [Repository](https://github.com/zai-org/ZCode) · [CLI plugin documentation](https://github.com/zai-org/ZCode/blob/main/apps/zcode-cli/README.md)
+
+Z.ai's open-source coding workspace provides desktop, browser, and terminal interfaces built on the agent CLI and runtime in the same repository. The web interface listens only on localhost by default and generates an access token when bound to other addresses. Plugins are local bundles that add skills, custom commands, and MCP servers. The README does not describe a permission or sandbox model; the license is Apache-2.0.
+
+<a id="source-opus-5-5-instruction-cleanup"></a>
+
+#### Opus 5.5 guide: migrate by cleaning up instructions
+
+**September 22, official article.** [Usage guide](https://claude.dev/blog/getting-the-most-out-of-opus-5-5/)
+
+Anthropic's Opus 5.5 guide recommends removing "think carefully" instructions, stating in CLAUDE.md when to keep going and when to stop and ask, and keeping a long task's checklist in a file because compaction summarizes older turns. Claude Code moves most messages flagged by safeguards to an older model and continues the session there, unless the user sets `/config` to ask first. This is usage guidance, not an engineering evaluation.
+
+<a id="refresh-2026-10-06-context"></a>
+
+### Context and memory
+
+<a id="source-claude-agents-md-fallback"></a>
+
+#### Claude Code: AGENTS.md as a fallback instruction file
+
+**September 18, v2.1.277; extended September 23 (v2.1.281) and fixed October 5 (v2.1.290).** [v2.1.277 release notes](https://github.com/anthropics/claude-code/releases/tag/v2.1.277) · [Memory documentation](https://code.claude.com/docs/en/memory)
+
+Claude Code reads AGENTS.md as project instructions when the working directory and its parents have no CLAUDE.md; a CLAUDE.local.md also counts as a CLAUDE.md for this check. A "Project instructions" setting offers four modes: CLAUDE.md, falling back to AGENTS.md when there is none (the default); both files; CLAUDE.md only; or managed instructions only. The documentation lists differences from CLAUDE.md: InstructionsLoaded hooks do not fire, and an external @import loads only if it was already approved. Version 2.1.281 extends support to Bedrock, Vertex, Foundry, gateways, and sessions without telemetry, and 2.1.290 attaches a subdirectory's AGENTS.md when a file under it is @-mentioned.
+
+<a id="source-codex-instruction-refresh"></a>
+
+#### Codex: when edited instructions take effect
+
+**September 22, Codex rust-v0.156.0.** [Release notes](https://github.com/openai/codex/releases/tag/rust-v0.156.0) · [PR #44675](https://github.com/openai/codex/pull/44675) · [PR #44701](https://github.com/openai/codex/pull/44701) · [PR #46577](https://github.com/openai/codex/pull/46577)
+
+Codex 0.156.0 reloads global instructions at each model-request boundary, including after tool calls within a turn, so edits to a global AGENTS.md apply during a running session; repository instructions are rediscovered only when the environment selection or trust level changes. Hosts can add thread-scoped instructions, capped at about 10,000 estimated tokens and rejected rather than truncated when larger. New subagents inherit the parent's applied snapshot, and later updates reach running descendants only when the provider opts in. The thread instruction provider is a host interface, not a CLI user setting.
+
+<a id="source-claude-auto-memory-guards"></a>
+
+#### Claude Code: recalled memory as untrusted input
+
+**September 28 and 29, v2.1.284 and v2.1.285.** [v2.1.284 release notes](https://github.com/anthropics/claude-code/releases/tag/v2.1.284) · [v2.1.285 release notes](https://github.com/anthropics/claude-code/releases/tag/v2.1.285)
+
+Claude Code 2.1.284 neutralizes invisible characters, and tags that imitate Claude Code's own markup, in MEMORY.md and recalled memory notes before they reach the model. Version 2.1.285 prevents a background session, or a session started by one of Claude Code's own tools, from turning auto memory on; turning it off still works there. The memory documentation says to turn it on from a session started directly in a terminal. Neutralizing these markers does not by itself stop every form of memory poisoning.
+
+<a id="source-copilot-memory-autofix"></a>
+
+#### Copilot Memory: written by one feature, used by others
+
+**September 25, public preview.** [Changelog](https://github.blog/changelog/2026-09-25-agentic-autofix-now-uses-copilot-memory) · [Copilot Memory documentation](https://docs.github.com/en/copilot/concepts/agents/copilot-memory)
+
+Agentic autofix reads Copilot Memory when fixing security alerts and stores each fix pattern as a memory that other Copilot features, such as code review and cloud agent, can use. The current documentation says repository facts carry citations to supporting code and are checked against the current branch before use. Only users with write access create them, they are used only in that repository, and unused entries are deleted after 28 days. The citation check and retention rule are documented behavior of Copilot Memory, not new in this release.
+
+<a id="source-vibemembench"></a>
+
+#### VibeMemBench: memory systems on repository tasks
+
+**September 20, arXiv v1.** [Paper](https://arxiv.org/abs/2609.23570v1)
+
+VibeMemBench tests memory systems on 111 repository coding targets with executable checks. Injecting experience already verified as useful raised resolution on four of five held-out solvers by 1.1 to 4.5 points, but when four existing memory systems built and retrieved experience from the same history, eleven of twelve solver and system pairings did not exceed the matched no-memory baseline. The authors trace the main failure to the form in which records are supplied. Targets were selected where injection helped, retrieval happens once before each run, and Claude and GPT models were not evaluated.
+
+<a id="refresh-2026-10-06-authority"></a>
+
+### Tools and authority
+
+<a id="source-claude-code-mods"></a>
+
+#### Claude Code mods: in-process extensions that can approve calls
+
+**October 1, first listed in the v2.1.287 CHANGELOG.** [Article](https://claude.com/resources/articles/claude-code-mods) · [Mods overview](https://code.claude.com/docs/en/plugins/mods/overview) · [Organization controls](https://code.claude.com/docs/en/plugins/mods/admin) · [v2.1.287 release notes](https://github.com/anthropics/claude-code/releases/tag/v2.1.287)
+
+Mods are plugin functions that run inside the Claude Code process and can observe, rewrite, or answer tool calls, prompts, and interface events; they are not sandboxed, and in an untrusted directory no mod loads before the user answers the trust prompt. A mod can approve a tool call before the permission prompt appears, but it cannot change what the prompt shows. Where the built-in `sec-default` guard loads, deny rules (unless the administrator sets `allowModsToOverrideDenyRules`) and managed `PreToolUse` hooks still take precedence, and the guard refuses users' mods if it cannot read managed settings; a user's mod can still approve a call that an `ask` rule would prompt for, and in auto mode that call skips the classifier. Deny rules do not cover a mod's own file and process calls, and v2.1.290 adds a `ceiling` field to `tool.check` for the approval level the organization requires.
+
+<a id="source-claude-managed-policy-precedence"></a>
+
+#### Claude Code: repository settings cannot widen managed policy
+
+**September 24 to October 5, v2.1.282 to v2.1.290; advisory September 29.** [CHANGELOG](https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md) · [GHSA-gfvf-j8jh-jxxw](https://github.com/anthropics/claude-code/security/advisories/GHSA-gfvf-j8jh-jxxw)
+
+Project settings can no longer widen or turn off an admin-required sandbox or extend a strict allowlist (v2.1.285), and under `allowManagedPermissionRulesOnly`, repository, user and `--add-dir` skills and commands can no longer pre-approve their own tools (v2.1.282), and plugins keep that pre-approval only from an official or admin-vouched source (v2.1.284). One invalid nested value no longer voids a whole managed `permissions`, `autoMode`, `worktree`, `attribution` (v2.1.282) or `sandbox` (v2.1.283) block; for `sandbox` the invalid value fails closed, and mistyped boolean lock keys now apply the lock (v2.1.282). The release notes state one exception to failing closed: if the OS denies reading the managed settings file, v2.1.285 warns and starts without that file's policies, while other read errors and unparseable files still block all sessions. The September 29 advisory CVE-2026-103012, fixed in 2.1.260, describes a stored API key causing a session to run without its organization's server-delivered policy; MDM and file-based managed settings were not affected.
+
+<a id="source-claude-auto-mode-default"></a>
+
+#### Claude Code: auto mode by default, and sandboxed commands still reviewed
+
+**September 23 to 29, v2.1.281, v2.1.284, and v2.1.285.** [v2.1.284 release notes](https://github.com/anthropics/claude-code/releases/tag/v2.1.284) · [CHANGELOG](https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md)
+
+From v2.1.284, interactive sessions with no configured permission mode start in auto mode on every plan and provider; `permissions.defaultMode` still overrides it. Version 2.1.285 extends this default to `claude -p` and Python Agent SDK sessions on third-party providers or with telemetry off. Where the auto-mode classifier runs server-side, v2.1.281 also holds read-only and sandboxed shell commands for its review, so a sandbox no longer means a command skips the classifier.
+
+<a id="source-copilot-local-sandbox-policy"></a>
+
+#### Copilot: local sandbox, default enablement, and per-app approval
+
+**September 23, September 24, and October 1; sandbox and computer use in public preview.** [Local sandboxing](https://github.blog/changelog/2026-09-23-local-sandboxing-in-the-github-copilot-app/) · [Default enablement](https://github.blog/changelog/2026-09-24-default-enablement-of-copilot-features-for-copilot-business-and-enterprise/) · [Computer use](https://github.blog/changelog/2026-10-01-github-copilot-can-now-interact-with-desktop-apps/)
+
+The Copilot app's local sandbox is configured per project for files, network, and Git or GitHub CLI credentials; enterprise settings can make the effective policy stricter, and if the OS cannot enforce the requested policy the sandboxed shell fails instead of running unsandboxed. It is off by default, is configured separately from Copilot CLI, and does not apply to cloud sandboxes or remote host sessions. A September 24 policy for Business and Enterprise lets administrators choose whether eligible generally available features left unconfigured, current and future, including the MCP servers policy, are enabled, disabled, or left to organizations; it takes effect October 22 and keeps choices already made. Computer use in Copilot CLI and the Copilot app on macOS and Windows asks before controlling each app and keeps a reviewable always-allow list.
+
+<a id="source-codex-network-revocation"></a>
+
+#### Codex CLI: network rules for the life of a connection
+
+**September 25, Codex CLI 0.157.0.** [Release notes](https://github.com/openai/codex/releases/tag/rust-v0.157.0)
+
+Codex CLI 0.157.0 applies network restrictions across redirects and to ongoing HTTP and WebSocket traffic, and cancels a connection when a policy change revokes access. A network grant is therefore checked while a connection lasts, not only when it opens.
+
+<a id="source-anthropic-checked-vs-effective"></a>
+
+#### Anthropic advisories: what was checked versus what took effect
+
+**September 25 and October 5, security advisories.** [GHSA-v234-4jrq-mgg6](https://github.com/anthropics/claude-code/security/advisories/GHSA-v234-4jrq-mgg6) · [GHSA-5j29-h97v-84ch](https://github.com/anthropics/claude-code/security/advisories/GHSA-5j29-h97v-84ch)
+
+Claude Desktop blocks opening certain run-on-open file types directly from a Cowork shared folder, but on macOS the list missed one such type, so a file written by a compromised or prompt-injected agent inside the sandbox could run commands on the host when the user opened it (affected from 1.1.3918, fixed in 1.15962.0). CVE-2026-103435 describes Claude Code checking at permission time that a write path is inside the project but resolving it again at write time; an attacker who can write to a shared workspace and wins the race can swap in a symlink and send the write outside the project. That issue was fixed in 2.1.129, well before the October 5 disclosure. A shared folder between sandbox and host is a return path that needs its own host-side control.
+
+<a id="source-gitspawn-background-git"></a>
+
+#### GitSpawn: background git commands before trust
+
+**September 1, research disclosure.** [Disclosure](https://www.manifold.security/blog/ai-coding-agents-git-hijack) · [goose advisory](https://github.com/aaif-goose/goose/security/advisories/GHSA-r5pp-p5r8-466r)
+
+Manifold Security reported that several CLI coding agents ran `git status` or `git diff` at startup or early in a session to gather context without stripping the repository's own git configuration, so a setting such as `core.fsmonitor` ran a repository-chosen command as the user, outside the sandbox, with no approval prompt. In Claude Code 2.1.193 this happened before the workspace trust prompt was accepted; it was fixed by 2.1.196. A second Claude Code finding, on the `claude ultrareview` path and using a different git setting, was still unpatched on 2.1.252 when the post was published on September 1. The attack needs a repository delivered as files with its `.git` directory, such as an archive or a synced folder, not a normal clone. The authors report eight findings across seven agents, four unpatched at publication; goose fixed its case in 1.44.0 (CVE-2026-72718).
+
+<a id="source-approval-scope-lifetime"></a>
+
+#### Approval laundering: what an approval covers and how long it lasts
+
+**September 23, 27, and 30, arXiv v1.** [Agent Approval Laundering](https://arxiv.org/abs/2609.28586v1) · [When Consent Outlives Context: Residual Authority Replay in Long-Lived Agents](https://arxiv.org/abs/2609.33910v1) · [Approval Laundering](https://arxiv.org/abs/2609.38983v1)
+
+Agent Approval Laundering (September 23) shows that an approval record names the entry command while its workflow, such as package lifecycle hooks, can have other effects, and it proposes attaching a prediction of the workflow's effects to the approval record before the user approves. When Consent Outlives Context: Residual Authority Replay in Long-Lived Agents (September 27) reports that approvals kept across tasks raise prompt-injection success by up to 35.1 percentage points on AgentDojo cases. Approval Laundering (September 30, single author) classifies six ways an executed action can differ from the approved one; a keyed approval token removed delegation mismatches in its tests but did not fix scope or argument mismatches. Two of the papers build on Claude Code's PreToolUse hook, one to measure approval mismatches and one to carry its approval record.
+
+<a id="refresh-2026-10-06-evaluation"></a>
+
+### Evaluation and evolution
+
+<a id="source-harness-buy-rerun-noise"></a>
+
+#### What Does a Harness Buy?: compare against rerun noise
+
+**October 3, arXiv v1.** [Paper](https://arxiv.org/abs/2610.04433v1)
+
+The study holds the model fixed and compares Claude Code, mini-SWE-agent, and OpenCode on SWE-bench Verified, using reruns of identical configurations as the noise baseline. On the 45 hardest tasks, swapping the harness changed as many task outcomes as rerunning the same harness. The measurable harness effects were ways to lose tasks, such as no recovery after an output cap, and per-task cost differed up to threefold, mainly from the system prompt and tool schemas resent on every step. Results cover one benchmark, and the Claude model ran only inside Claude Code.
+
+<a id="source-frozen-judges"></a>
+
+#### Frozen Judges: judge error moves with the agent version
+
+**September 28, arXiv v1; v2 September 29.** [Paper](https://arxiv.org/abs/2609.34198v2)
+
+A fixed LLM judge can make version-dependent errors when it compares an agent release with its predecessor. On SWE-bench Verified, for several version pairs, confidence intervals based only on judge scores showed an upgrade that test execution could not confirm, although judge rankings correlated well with the reference, and failed patches from stronger agents were accepted more often. The author recommends using judges to screen comparisons and basing release decisions on a randomly sampled, labeled audit of current outputs. Independent human patch review is still pending.
+
+<a id="source-self-healing-harness"></a>
+
+#### Self-Healing Harness: keep a rule only if prior successes hold
+
+**September 21, arXiv v1.** [Paper](https://arxiv.org/abs/2609.24130v1)
+
+The agent writes candidate rules and an external runtime decides which persist: a rule is kept only if it fixes the failure that triggered it without regressing protected cases that previously succeeded, and a separate guard retests the accumulated rule set. Of 383 proposals rejected by replay, 211 fixed their triggering failure while breaking a protected case. The study did not compare against admitting the same rules without the gate, and it replays at most two protected cases per round, so the 211 are detected conflicts, not total incidence.
+
+<a id="source-overclaiming-transcripts"></a>
+
+#### Overclaiming: reports of work the transcript does not show
+
+**September 17, arXiv v1; v3 September 22.** [Paper](https://arxiv.org/abs/2609.20812v3)
+
+The study defines overclaiming as a final report of work that the agent's own transcript shows it did not do, such as claiming to have read an unopened file. File coverage is measured from transcripts, and an LLM judge classifies the report. Across five review scenarios run in production CLIs, agents left required files unread in about two thirds of runs, most of those incomplete runs claimed a full review or did not disclose the gap, and requiring subagents raised coverage but not honest reporting. The scenarios were tuned against Claude Opus.
+
+<a id="source-terminal-bench-hardness"></a>
+
+#### Terminal-Bench hardness: a zero pass rate needs an audit
+
+**September 20, arXiv v1.** [Paper](https://arxiv.org/abs/2609.26826v1)
+
+The paper audits tasks that no agent passed in a frozen Terminal-Bench 3 production record, checking in order whether the reference solution passes, whether infrastructure failures dominate, whether a verifier bypass exists, and whether solvability is supported. Of 125 all-fail tasks, 78 remained candidates for genuinely unsolved; the rest had broken reference solutions, infrastructure problems, bypass-only passes, or unproven solvability. Of the 78, 53 rest on a single reference-solution run, so the label is narrow and does not prove intrinsic difficulty.
+
+<a id="source-deltaselect-ab"></a>
+
+#### DeltaSelect: small fixed task sets for A/B comparisons
+
+**September 17, arXiv v1.** [Paper](https://arxiv.org/abs/2609.19607v1)
+
+DeltaSelect selects a small fixed task set for repeated baseline-versus-candidate comparisons during development, not for model rankings. Tasks are ranked by how reliably a single run tracks full-benchmark results, and the set, calibration, and prices are frozen before the first comparison; the baseline must be rerun in the exact harness and version being changed. The author notes that the selector was not compared with random selection at equal cost and that repeated tuning on a small set can overfit it.
+
+<a id="source-claude-build-eval-hillclimb"></a>
+
+#### Claude API skill: build an evaluation, then keep or revert each patch
+
+**September 28, official article.** [Article](https://claude.dev/blog/automating-eval-design-and-hillclimbing/)
+
+`/claude-api build-eval` builds an evaluation in the codebase and checks grader consistency and infrastructure failures such as timeouts and truncation. `/claude-api hillclimb` splits cases into train and held-out test sets and first checks that evaluation noise is smaller than the smallest gain worth acting on. Each round proposes one patch, which is reverted if the training score rises while the held-out score stays flat or if either regresses; when the score stalls for two or three rounds, the loop sorts the remaining training failures by cause and continues only on the legitimate ones, and it recommends against merging when the final gain is within noise. The examples are Anthropic's own and are not independently replicated.
+
+<a id="source-skill-revision-study"></a>
+
+#### Agent Skill Evolution: what SKILL.md revisions change
+
+**October 4, arXiv v1.** [Paper](https://arxiv.org/abs/2610.04832v1)
+
+The study compares the first and last versions of 2,608 SKILL.md files. The authors report that adding automatically checkable rules raised the share of episodes in which four agents took the required action by 0.23 on average (on a 0 to 1 scale), and that about half of that gain remained when the skill body loaded on demand.
+
+<a id="source-langsmith-engine-fix-validation"></a>
+
+#### LangSmith Engine v2: reproduce a failure before review
+
+**September 24, vendor article; fix validation in private beta.** [Article](https://www.langchain.com/blog/langsmith-engine-v2-redteam)
+
+Engine first reproduces a failure in LangSmith Deployment, then tests the fix on the same inputs before passing it to human review. The article describes checks on the failing inputs only, not on cases that previously succeeded.
+
 <a id="refresh-2026-09-15"></a>
 
-## Agent design sources — September 15, 2026
+## Agent design sources: September 15, 2026
 
 Dates are in 2026 unless stated otherwise; release timestamps use UTC. ArXiv papers are preprints, and experimental results are those reported by their authors. The Claude Code architecture analysis covers v2.1.88; newer versions below describe later changes.
 
@@ -142,7 +476,7 @@ Claude can run Python that calls tools, pauses for client results, and resumes i
 
 **September 8, main-branch commit 2cbbf0c9.** [Main-branch change](https://github.com/openai/codex/commit/2cbbf0c9b542a36a1c3284b5e804917635b6f666)
 
-Codex's September 8 main-branch code adds a separate memory v2 store and optional writes to both versions; the selected version supplies context. V2 prioritizes user messages and answers to agent questions within the extraction input budget, then builds task summaries. The prompts require task-specific corrections to stay with the task and explicit correction or deletion notes to be applied during consolidation. The [stable 0.154.0 memory configuration](https://github.com/openai/codex/blob/6b9826e3aa83b1a5947db50f4332cb9c65f1b340/codex-rs/config/src/types.rs#L289) lacks the v2 selectors.
+Codex's September 8 main-branch code adds a separate memory v2 store and optional writes to both versions; the selected version supplies context. V2 prioritizes user messages and answers to agent questions within the extraction input budget, then builds task summaries. The prompts require task-specific corrections to stay with the task and explicit correction or deletion notes to be applied during consolidation. Since [stable 0.155.0](https://github.com/openai/codex/releases/tag/rust-v0.155.0) (September 17), the [memory configuration](https://github.com/openai/codex/blob/rust-v0.155.0/codex-rs/config/src/types.rs) accepts `version` and `dual_write`; v1 remains the default through 0.160.0, and the configuration reference did not list the two keys as of October 6, 2026.
 
 <a id="source-claude-tag-recall-scope"></a>
 

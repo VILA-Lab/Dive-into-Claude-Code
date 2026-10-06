@@ -4,13 +4,347 @@
 
 # 智能体系统设计空间：来源笔记
 
-更新日期：2026 年 9 月 15 日。
+更新日期：2026 年 10 月 6 日。
 
 本页说明[资源目录](../README_zh.md)和[设计指南](./build-your-own-agent_zh.md)所涉及的机制、实现选择及版本适用条件。[English version](./agent-design-space-source-notes.md)。
 
-截至 2026 年 9 月 7 日的历史来源笔记位于本节之后。
+截至 2026 年 9 月 15 日的历史来源笔记位于本节之后。
 
 <a id="用语约定"></a>
+
+<a id="refresh-2026-10-06"></a>
+
+## 智能体设计来源：2026 年 10 月 6 日
+
+除另有说明外，日期均为 2026 年；release 时间使用 UTC。arXiv 论文为预印本，实验结果来自论文作者的报告；厂商给出的数字未经独立核实。Claude Code 架构分析对应 v2.1.88；下文中的更新版本说明后续变化。
+
+<a id="refresh-2026-10-06-graph"></a>
+
+### 工作图与控制循环
+
+<a id="source-cursor-rollouts-verdicts"></a>
+
+#### Cursor Rollouts：部署之后再检查变更
+
+**9 月 23 日，面向 Teams 和 Enterprise 的 changelog 条目。** [Changelog 条目](https://cursor.com/changelog/rollouts-and-security-reviewer)
+
+PR 打开时，Rollouts 发布一份作者可以编辑的监控计划，列出风险、预期效果、要检查的信号和缺失的监测。每次部署后，它按环境分别给出结论：健康、回归或无法判断。发现回归时，视配置而定，它可以开一个待审查的 revert PR，或把结果交给云端智能体处理，但不会自行合并或回滚。保留“无法判断”这一结论，可以避免把缺少证据当作通过。
+
+<a id="source-adk-abort-resume"></a>
+
+#### Google ADK：中止、审批暂停与恢复时重跑
+
+**10 月 1 日，ADK Python 2.11.0；相关变化见 9 月 10 日的 2.9.0。** [v2.11.0 发布说明](https://github.com/google/adk-python/releases/tag/v2.11.0) · [v2.9.0 发布说明](https://github.com/google/adk-python/releases/tag/v2.9.0)
+
+ADK Python 2.11.0 允许用中止信号优雅地停止 Runner、工作流或单个节点；工作流中的工具节点现在会暂停等待用户批准，而不是把错误传给下游。自 9 月 10 日发布的 2.9.0 起，工作流恢复时会重新运行失败的节点；此前这类节点会被当作已完成重放。因此发布说明要求节点体保持幂等：一个执行了副作用后失败的节点，每次恢复都会再次执行该副作用。以上说明只针对 ADK Python。
+
+<a id="source-subgoal-authorization"></a>
+
+#### 子目标授权：把重新规划视为权限变化
+
+**10 月 4 日，arXiv v1。** [论文](https://arxiv.org/abs/2610.04975v1)
+
+Zhu 与 Wang 把新建、替换、委派或合并子目标都当作授权事件。每次修改都要经过与当前策略和状态版本绑定的结构化检查，确认新的延续仍在已批准的任务之内；受保护的副作用在提交时还要再检查一次。逐次调用的权限检查看不到这一点，因为两个各自被允许的动作组合起来可能违反任务约束。评估使用有限的结构化领域和合成用例，属于研究原型，不是已部署的控制机制。
+
+<a id="source-opencollab-adherence"></a>
+
+#### OpenCollab：声明的组织是否真的在运行？
+
+**9 月 29 日，arXiv v1。** [论文](https://arxiv.org/abs/2609.38345v1)
+
+OpenCollab 用事件记录衡量声明的多智能体组织（角色边界与通信拓扑）在运行时是否真正实现。在不加约束的默认配置下，47.2% 的运行遵循了声明的结构；主智能体会自己用掉预算而不委派，或绕过队友。限制工具边界后，这一比例超过 90%，但在只读设置下任务成功率下降。配置中的拓扑只是一个请求，在把结果归因于它之前，应先检查事件记录。
+
+<a id="source-claude-loop-wakeups"></a>
+
+#### Claude Code：循环唤醒是运行状态
+
+**9 月 23 日至 10 月 5 日，v2.1.281 至 v2.1.290。** [CHANGELOG](https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md) · [v2.1.290](https://github.com/anthropics/claude-code/releases/tag/v2.1.290)
+
+这些版本修复了 `/loop` 唤醒和定时任务在压缩、恢复、转入后台、更新和容器重启时的保存问题。自 v2.1.284 起，自定步调的循环把每次状态更新和停止结果写成可见文本。待执行的唤醒有独立的生命周期，在上述每个边界都可能丢失或重复。来源是发布说明，不是设计文档。
+
+<a id="refresh-2026-10-06-runtime"></a>
+
+### 运行时与协调
+
+<a id="source-claude-stop-scopes"></a>
+
+#### Claude Code：停止一个回合与停止后台工作
+
+**9 月 17 日至 10 月 5 日，v2.1.275 至 v2.1.290。** [CHANGELOG](https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md) · [v2.1.281](https://github.com/anthropics/claude-code/releases/tag/v2.1.281)
+
+在 v2.1.275 中，send-now 键（ctrl+enter，在 Claude 仍在工作时发送排队消息）会打断当前回合；自 v2.1.281 起，它改为把正在运行的工具移到后台，而不取消该回合。在 VS Code 扩展中，Stop 和 Escape 只结束当前回合；后台智能体继续运行，可在 agent 地图中逐个停止（v2.1.286）。v2.1.285 为后台 shell 命令加入时限（默认 30 分钟，最长 2 小时）；自 v2.1.288 起，该时限只适用于无人值守的会话，例如 `-p`、Agent SDK、CI 和云端会话。自 v2.1.287 起，来自 `claude agents` 的回复以排队消息送达，除 `/stop` 外的斜杠命令在当前回合结束时才执行；不过 v2.1.290 让 `/model`、`/effort` 和 `/rename` 对忙碌的后台会话立即生效。
+
+<a id="source-vscode-remote-agent-hosts"></a>
+
+#### VS Code 1.140：委派给远端 agent host
+
+**9 月 30 日，VS Code 1.140；实验性功能，默认关闭。** [发布说明](https://code.visualstudio.com/updates/v1_140)
+
+新工具让智能体可以列出已连接的远端 agent host 及其容量和会话负载，在指定 host 上启动会话，或选择满足操作系统、内存和 CPU 要求的 host，查看会话状态并互发消息。远端会话除非指定，否则没有工作区；这些工具不会复制发起方的工作区，常规审批仍然适用。远端智能体通过 `send_remote_message` 回报，其最终答复不会自动转发，协调窗口必须保持打开，消息才能流转。同一版本提高了编排上限；达到上限时会阻止新的编排动作，但不会打断已经在运行的工作。
+
+<a id="source-copilot-dynamic-workflows"></a>
+
+#### Copilot dynamic workflows：上限、暂停与恢复
+
+**10 月 1 日，公开预览。** [Changelog](https://github.blog/changelog/2026-10-01-dynamic-workflows-in-copilot-cli-and-the-copilot-app) · [概念文档](https://docs.github.com/en/copilot/concepts/agents/dynamic-workflows)
+
+在 Copilot CLI、Copilot app 和 Copilot SDK 中，workflow 是一段代码，规定步骤、何时调用智能体以及如何使用其结果。达到并发上限时，新智能体会等待；智能体总数、活跃运行时间和近似 AI credits 这几项上限会停止运行，但保留状态和已保存结果，提高后的上限仍计入停止前的用量。恢复时可复用已完成步骤和子智能体的已保存结果，未保存的工作可能需要重跑。workflow 的子智能体继承会话的权限授予，因此为某个子智能体作出的会话期授权也适用于其他子智能体。
+
+<a id="source-exactly-once-tool-contract"></a>
+
+#### 恰好一次：哪一层防止重复写入
+
+**9 月 24 日，arXiv v1。** [论文](https://arxiv.org/abs/2609.29095v1)
+
+这项研究（*Where Does Exactly-Once Live?*）在工具边界注入故障，例如在智能体停止等待之后才提交的写入，或被投递两次的请求，并依据已提交效果的账本为每个 episode 评分，其中包括在 GitHub Copilot CLI、Hermes 和 Codex CLI 下的运行。作者报告：被要求恰好执行一次的前沿模型，在确认丢失时几乎从不重复写入，但对仍在途或被投递两次的请求经常重复执行；为每次写入提供幂等键后，重复率从 28% 降到 4%，三个 harness 的表现几乎相同。在产生重复的 episode 中，有 90% 的智能体报告任务已完成。这些结果来自一位作者在合成基准上的报告，论文称代码和数据将在发表时公开。
+
+<a id="source-planarian-statepoints"></a>
+
+#### Planarian：本地与远端状态共用一个恢复点
+
+**9 月 28 日，arXiv v1。** [论文](https://arxiv.org/abs/2609.35366v1) · [StateFork](https://arxiv.org/abs/2609.38648v1)
+
+Planarian 是一个研究原型，其 statepoint 同时覆盖沙箱中的文件和进程，以及通过 MCP 对远端作出的更改。它在本地做增量检查点，并为每个远端调用记录补偿动作；回滚按相反顺序执行这些补偿动作，再恢复本地快照，分叉则创建相互隔离的分支。无法改写为可补偿形式的远端请求会在执行前被拒绝，补偿只为数据库 MCP 服务器上的 SQL 操作实现。StateFork（arXiv，9 月 29 日）研究如何分支和恢复终端会话，让智能体可以尝试不同方案。
+
+<a id="source-codex-queued-reconnect"></a>
+
+#### Codex CLI：先确定结果不明的提交，再重发
+
+**9 月 29 日和 10 月 1 日，Codex CLI 0.159.0 与 0.160.0。** [0.160.0 发布说明](https://github.com/openai/codex/releases/tag/rust-v0.160.0) · [0.159.0 发布说明](https://github.com/openai/codex/releases/tag/rust-v0.159.0)
+
+重连后，Codex CLI 0.160.0 只有在确定那些结果不明的提交之后，才恢复发送未发出的排队消息，以免重复发送。0.159.0 新增可选的 `instant_interrupt` 设置，允许新输入在模型响应期间或长时间运行的 code-mode 调用期间引导 Codex。
+
+<a id="refresh-2026-10-06-harness"></a>
+
+### Harness 与应用接口
+
+<a id="source-agents-api-computer-use"></a>
+
+#### Agents API 计算机使用：来源批准与登录
+
+**9 月 29 日，Agents API 公开测试版。** [API changelog](https://developers.openai.com/api/docs/changelog) · [计算机使用指南](https://developers.openai.com/api/docs/guides/agents-api/tools/computer-use)
+
+OpenAI 为 Agents API 加入计算机使用，浏览器运行在 OpenAI 托管的环境中。每个新的网站来源都需要用户批准，这与环境的网络策略相互独立；来源批准也不代表对购买等单个操作的确认。登录信息通过专用事件提交，不进入模型输入和会话历史；只有主智能体能请求登录，子智能体不能。断线后，应用应重新读取会话的待处理动作，而不是重新发送任务或批准。
+
+<a id="source-cursor-token-efficiency"></a>
+
+#### Cursor：去掉模型已不需要的 harness 工作
+
+**9 月 23 日，工程文章。** [文章](https://cursor.com/blog/improved-token-efficiency)
+
+Cursor 报告称，harness 改动使用户 token 成本降低 7%，且未降低智能体质量；文章描述了在生产流量上对单项改动做 A/B 测试。随着模型变强，它删去约 66% 的系统提示，按需加载不常用的内置工具，在每个请求中很少变化的部分之后设置缓存断点，并删除推动使用子智能体的指令，因为较新的模型已在训练中学会这种做法。这些数字由厂商报告，文章未公布评测细节。
+
+<a id="source-harness-design-components"></a>
+
+#### Harness 组件：价值取决于模型与上下文预算
+
+**9 月 17 日，arXiv v1；相关研究为 9 月 30 日。** [论文](https://arxiv.org/abs/2609.20804v1) · [机器学习工程研究](https://arxiv.org/abs/2609.40303v1)
+
+该研究固定编码 harness 的执行循环，在四个开放模型、四种上下文预算和 176 组设置上，于 SWE-Bench Verified 和 Terminal-Bench 2.1 中变动规划、动作空间和上下文管理。上下文预算越紧，上下文管理越重要，主要作用是防止溢出；先删减陈旧工具输出、再做 LLM 摘要的策略，成功率与其他管理策略相近，并在八个模型与基准组合中的七个里成本最低，而召回被删减内容的工具很少被使用。规划提高了较弱模型的准确率，对较强模型则主要降低成本；每个设置只运行一次，也未测试闭源前沿模型。9 月 30 日一项针对机器学习工程任务的研究发现，在同一强骨干模型下，四个开源 harness 均未优于单个最小编码智能体会话，而较弱的骨干模型仍受益于工作流先验。
+
+<a id="source-zcode-shared-runtime"></a>
+
+#### ZCode：三种界面构建在同一仓库的智能体运行时之上
+
+**2026 年 9 月，源码发布；最早公开提交为 9 月 20 日，README 记载 9 月 23 日更新到 v3.14.3。** [仓库](https://github.com/zai-org/ZCode) · [CLI 插件文档](https://github.com/zai-org/ZCode/blob/main/apps/zcode-cli/README.md)
+
+Z.ai 开源的编程工作台提供桌面、浏览器和终端界面，构建在同一仓库中的智能体 CLI 与运行时之上。Web 界面默认只监听本机地址，绑定其他地址时会生成访问令牌。插件是本地包，可添加 skills、自定义命令和 MCP 服务器。README 未说明权限或沙箱模型；许可证为 Apache-2.0。
+
+<a id="source-opus-5-5-instruction-cleanup"></a>
+
+#### Opus 5.5 指南：通过清理指令完成迁移
+
+**9 月 22 日，官方文章。** [使用指南](https://claude.dev/blog/getting-the-most-out-of-opus-5-5/)
+
+Anthropic 的 Opus 5.5 指南建议删除“仔细思考”之类的指令，在 CLAUDE.md 中写明何时继续、何时停下询问，并把长任务的清单保存在文件中，因为压缩会总结较早的回合。被安全机制标记的消息，多数会由 Claude Code 转到较旧的模型上继续会话，除非用户在 `/config` 中改为先询问。这是使用指南，不是工程评测。
+
+<a id="refresh-2026-10-06-context"></a>
+
+### 上下文与记忆
+
+<a id="source-claude-agents-md-fallback"></a>
+
+#### Claude Code：AGENTS.md 作为备用指令文件
+
+**9 月 18 日，v2.1.277；9 月 23 日（v2.1.281）扩展，10 月 5 日（v2.1.290）修复。** [v2.1.277 发布说明](https://github.com/anthropics/claude-code/releases/tag/v2.1.277) · [Memory 文档](https://code.claude.com/docs/en/memory)
+
+工作目录及其上级目录没有 CLAUDE.md 时，Claude Code 将 AGENTS.md 作为项目指令读取；在这一判断中，CLAUDE.local.md 也算作 CLAUDE.md。“Project instructions” 设置提供四种模式：优先读 CLAUDE.md，没有时读 AGENTS.md（默认）；两者同时读取；只读 CLAUDE.md；或只读托管指令。文档列出了与 CLAUDE.md 的差异：不触发 InstructionsLoaded hook；外部 @import 只有在此前已获批准时才加载。2.1.281 将支持扩展到 Bedrock、Vertex、Foundry、网关以及关闭遥测的会话，2.1.290 则在 @ 提及某子目录下的文件时附加该子目录的 AGENTS.md。
+
+<a id="source-codex-instruction-refresh"></a>
+
+#### Codex：修改后的指令何时生效
+
+**9 月 22 日，Codex rust-v0.156.0。** [发布说明](https://github.com/openai/codex/releases/tag/rust-v0.156.0) · [PR #44675](https://github.com/openai/codex/pull/44675) · [PR #44701](https://github.com/openai/codex/pull/44701) · [PR #46577](https://github.com/openai/codex/pull/46577)
+
+Codex 0.156.0 在每个模型请求边界（包括同一回合内的工具调用之后）重新加载全局指令，因此对全局 AGENTS.md 的修改在会话运行中即可生效；仓库指令只在环境选择或信任级别变化时重新发现。宿主可以加入线程级指令，上限约为 10,000 个估算 token，超出时直接拒绝而不是截断。新子智能体继承父线程已应用的指令快照；只有提供方明确选择共享，后续更新才会传到正在运行的子智能体。线程指令提供方是宿主接口，不是 CLI 用户的配置项。
+
+<a id="source-claude-auto-memory-guards"></a>
+
+#### Claude Code：召回的记忆按不可信输入处理
+
+**9 月 28 日和 29 日，v2.1.284 与 v2.1.285。** [v2.1.284 发布说明](https://github.com/anthropics/claude-code/releases/tag/v2.1.284) · [v2.1.285 发布说明](https://github.com/anthropics/claude-code/releases/tag/v2.1.285)
+
+Claude Code 2.1.284 在 MEMORY.md 和被召回的记忆便笺送入模型之前，中和其中的不可见字符和模仿 Claude Code 自身标记的标签。2.1.285 规定后台会话，或由 Claude Code 自身工具启动的会话，不能开启自动记忆；在这些会话中仍可关闭。记忆文档说明，需要在直接从终端启动的会话中开启。中和这些标记本身并不能阻止所有形式的记忆投毒。
+
+<a id="source-copilot-memory-autofix"></a>
+
+#### Copilot Memory：一个功能写入，其他功能使用
+
+**9 月 25 日，公开预览。** [Changelog](https://github.blog/changelog/2026-09-25-agentic-autofix-now-uses-copilot-memory) · [Copilot Memory 文档](https://docs.github.com/en/copilot/concepts/agents/copilot-memory)
+
+agentic autofix 在修复安全告警时读取 Copilot Memory，并把每个修复模式写为记忆，供 code review、cloud agent 等其他 Copilot 功能使用。现行文档说明，仓库级事实附有指向支撑代码的引用，使用前会对照当前分支校验。只有具有写权限的用户能产生这类事实，它们只用于该仓库；未被使用的条目在 28 天后删除。引用校验和保留规则是 Copilot Memory 已有文档中的行为，并非此次发布新增。
+
+<a id="source-vibemembench"></a>
+
+#### VibeMemBench：记忆系统在仓库任务上的表现
+
+**9 月 20 日，arXiv v1。** [论文](https://arxiv.org/abs/2609.23570v1)
+
+VibeMemBench 用可执行检查在 111 个仓库编码目标上测试记忆系统。注入已验证有用的经验，使 5 个留出求解器中的 4 个解决率提高 1.1 至 4.5 个百分点；但当 4 个现有记忆系统从同一历史中自行构建并检索经验时，12 个求解器与系统组合中有 11 个没有超过匹配的无记忆基线。作者把主要问题归于记录的提供形式。目标是按“注入有效”筛选的，检索在每次运行开始前一次完成，也未评估 Claude 和 GPT 模型。
+
+<a id="refresh-2026-10-06-authority"></a>
+
+### 工具与权限
+
+<a id="source-claude-code-mods"></a>
+
+#### Claude Code mods：能批准调用的进程内扩展
+
+**10 月 1 日，首次列于 v2.1.287 CHANGELOG。** [文章](https://claude.com/resources/articles/claude-code-mods) · [Mods 概览](https://code.claude.com/docs/en/plugins/mods/overview) · [组织控制](https://code.claude.com/docs/en/plugins/mods/admin) · [v2.1.287 发布说明](https://github.com/anthropics/claude-code/releases/tag/v2.1.287)
+
+mods 是插件中的函数，在 Claude Code 进程内运行，可以观察、改写或直接应答工具调用、提示和界面事件；它们不在沙箱内运行，在未信任的目录中，用户回答信任提示之前不会加载任何 mod。mod 可以在权限提示出现前批准工具调用，但不能改变提示显示的内容。在内置 `sec-default` 守卫加载的环境中，deny 规则（除非管理员设置了 `allowModsToOverrideDenyRules`）和托管 `PreToolUse` hook 仍然优先，守卫读不到托管设置时会拒绝加载用户的 mod；但用户的 mod 仍可批准 `ask` 规则本应提示的调用，在 auto mode 下这类调用不经过分类器。deny 规则不覆盖 mod 自身的文件和进程调用；v2.1.290 为 `tool.check` 增加 `ceiling` 字段，表示组织要求的批准级别。
+
+<a id="source-claude-managed-policy-precedence"></a>
+
+#### Claude Code：仓库设置不能放宽托管策略
+
+**9 月 24 日至 10 月 5 日，v2.1.282 至 v2.1.290；公告为 9 月 29 日。** [CHANGELOG](https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md) · [GHSA-gfvf-j8jh-jxxw](https://github.com/anthropics/claude-code/security/advisories/GHSA-gfvf-j8jh-jxxw)
+
+项目设置不能再放宽或关闭管理员要求的沙箱，也不能扩展严格允许列表（v2.1.285）；在 `allowManagedPermissionRulesOnly` 下，仓库、用户和 `--add-dir` 中的 skill 与命令不能再预先批准自己的工具（v2.1.282），插件只有来自官方或管理员认可的来源才保留这种预先批准（v2.1.284）。一个嵌套值无效时，不再导致整个托管 `permissions`、`autoMode`、`worktree`、`attribution`（v2.1.282）或 `sandbox`（v2.1.283）设置块被忽略；对 `sandbox` 而言，该无效值按拒绝处理；类型写错的布尔锁定键现在也会生效（v2.1.282）。发布说明写明了按拒绝处理的一个例外：如果操作系统拒绝读取托管设置文件，v2.1.285 会发出警告，并在没有该文件策略的情况下启动；其他读取错误和无法解析的文件仍会阻止所有会话。9 月 29 日的公告 CVE-2026-103012（2.1.260 修复）说明，本地存储的 API key 可能使会话在没有组织服务端下发策略的情况下运行；MDM 和文件形式的托管设置不受影响。
+
+<a id="source-claude-auto-mode-default"></a>
+
+#### Claude Code：默认 auto mode，沙箱命令仍需审查
+
+**9 月 23 日至 29 日，v2.1.281、v2.1.284 与 v2.1.285。** [v2.1.284 发布说明](https://github.com/anthropics/claude-code/releases/tag/v2.1.284) · [CHANGELOG](https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md)
+
+从 v2.1.284 起，未配置权限模式的交互式会话在所有套餐和提供商上都以 auto mode 启动；`permissions.defaultMode` 仍可覆盖。v2.1.285 把这一默认扩展到第三方提供商或关闭遥测时的 `claude -p` 与 Python Agent SDK 会话。在 auto mode 分类器于服务端运行的情况下，v2.1.281 让只读和已沙箱化的 shell 命令也等待分类器审查，因此命令处于沙箱中不再意味着它可以跳过分类器。
+
+<a id="source-copilot-local-sandbox-policy"></a>
+
+#### Copilot：本地沙箱、默认启用策略与按应用批准
+
+**9 月 23 日、9 月 24 日和 10 月 1 日；沙箱与计算机使用为公开预览。** [本地沙箱](https://github.blog/changelog/2026-09-23-local-sandboxing-in-the-github-copilot-app/) · [默认启用](https://github.blog/changelog/2026-09-24-default-enablement-of-copilot-features-for-copilot-business-and-enterprise/) · [计算机使用](https://github.blog/changelog/2026-10-01-github-copilot-can-now-interact-with-desktop-apps/)
+
+Copilot app 的本地沙箱按项目配置文件、网络以及 Git 或 GitHub CLI 凭据；企业设置可以使实际策略更严格，如果操作系统无法执行所请求的策略，沙箱 shell 会报错，而不是在无沙箱的情况下运行。它默认关闭，与 Copilot CLI 分开配置，不适用于云沙箱或远程主机会话。9 月 24 日发布的 Business 和 Enterprise 策略让管理员决定：未配置的合格 GA 功能（包括现有和未来的功能，以及 MCP 服务器策略）默认开启、默认关闭还是交给组织决定；该策略于 10 月 22 日生效，已作出的选择保持不变。在 macOS 和 Windows 上，Copilot CLI 与 Copilot app 的计算机使用会在控制每个应用前请求批准，并保留可查看的“始终允许”列表。
+
+<a id="source-codex-network-revocation"></a>
+
+#### Codex CLI：在连接存续期间执行网络规则
+
+**9 月 25 日，Codex CLI 0.157.0。** [发布说明](https://github.com/openai/codex/releases/tag/rust-v0.157.0)
+
+Codex CLI 0.157.0 把网络限制应用于重定向以及持续进行的 HTTP 和 WebSocket 流量；策略变更撤销访问权限时，会取消已有连接。因此网络授权在连接过程中持续检查，而不只在建立连接时检查。
+
+<a id="source-anthropic-checked-vs-effective"></a>
+
+#### Anthropic 公告：检查的对象与实际生效的对象
+
+**9 月 25 日和 10 月 5 日，安全公告。** [GHSA-v234-4jrq-mgg6](https://github.com/anthropics/claude-code/security/advisories/GHSA-v234-4jrq-mgg6) · [GHSA-5j29-h97v-84ch](https://github.com/anthropics/claude-code/security/advisories/GHSA-5j29-h97v-84ch)
+
+Claude Desktop 禁止从 Cowork 共享文件夹直接打开某些“打开即执行”的文件类型，但 macOS 上的列表遗漏了一种这样的类型；沙箱内被攻陷或被提示注入的智能体写入的文件，在用户打开时可能在主机上执行命令（受影响版本自 1.1.3918 起，1.15962.0 修复）。CVE-2026-103435 说明，Claude Code 在权限检查时验证写入路径位于项目内，但在写入时重新解析路径；能写入共享工作区并赢得竞态的攻击者可以换入符号链接，把写入引到项目之外。该问题已在 2.1.129 修复，远早于 10 月 5 日的披露。沙箱与主机之间的共享文件夹是一条返回通道，需要在主机侧另设控制。
+
+<a id="source-gitspawn-background-git"></a>
+
+#### GitSpawn：信任之前的后台 git 命令
+
+**9 月 1 日，研究披露。** [披露文章](https://www.manifold.security/blog/ai-coding-agents-git-hijack) · [goose 公告](https://github.com/aaif-goose/goose/security/advisories/GHSA-r5pp-p5r8-466r)
+
+Manifold Security 报告，多个 CLI 编码智能体在启动时或会话开始后不久运行 `git status` 或 `git diff` 收集上下文，但没有去除仓库自带的 git 配置，因此 `core.fsmonitor` 等设置会以用户身份运行仓库指定的命令；该命令在沙箱之外运行，也没有批准提示。在 Claude Code 2.1.193 中，这发生在工作区信任提示被接受之前；2.1.196 已修复。另一项 Claude Code 问题出现在 `claude ultrareview` 路径上，利用的是另一个 git 设置，到 9 月 1 日文章发布时在 2.1.252 上仍未修复。攻击需要仓库以带 `.git` 目录的文件形式送达，例如压缩包或同步文件夹，普通 clone 不会触发。作者报告了 7 个智能体中的 8 项问题，发布时其中 4 项尚未修复；goose 在 1.44.0 修复了其问题（CVE-2026-72718）。
+
+<a id="source-approval-scope-lifetime"></a>
+
+#### 批准洗白：批准覆盖什么、持续多久
+
+**9 月 23 日、27 日和 30 日，arXiv v1。** [Agent Approval Laundering](https://arxiv.org/abs/2609.28586v1) · [When Consent Outlives Context: Residual Authority Replay in Long-Lived Agents](https://arxiv.org/abs/2609.33910v1) · [Approval Laundering](https://arxiv.org/abs/2609.38983v1)
+
+Agent Approval Laundering（9 月 23 日）指出，批准记录只写入口命令，而它启动的工作流（例如包的生命周期 hook）可能产生其他效果；作者提出在用户批准前，把对该工作流可能产生的效果的预测写入批准记录。When Consent Outlives Context: Residual Authority Replay in Long-Lived Agents（9 月 27 日）报告，在 AgentDojo 用例上，跨任务保留的批准最多使提示注入成功率提高 35.1 个百分点。Approval Laundering（9 月 30 日，单一作者）归纳了实际执行的动作与已批准动作不一致的六种方式；在作者的测试中，带密钥的批准令牌消除了委派类不一致，但没有解决范围类和参数类不一致。其中两篇论文基于 Claude Code 的 PreToolUse hook：一篇用它测量批准不一致，另一篇用它传递批准记录。
+
+<a id="refresh-2026-10-06-evaluation"></a>
+
+### 评测与演化
+
+<a id="source-harness-buy-rerun-noise"></a>
+
+#### What Does a Harness Buy?：与重跑噪声比较
+
+**10 月 3 日，arXiv v1。** [论文](https://arxiv.org/abs/2610.04433v1)
+
+该研究固定模型，在 SWE-bench Verified 上比较 Claude Code、mini-SWE-agent 和 OpenCode，并以相同配置的重跑作为噪声基准。在最难的 45 个任务上，更换 harness 改变的任务结果与重跑同一 harness 一样多。能测出的 harness 效应都是丢失任务的方式，例如输出达到上限后不恢复；单任务成本最多相差三倍，主要来自每一步都重新发送的系统提示和工具 schema。结果只覆盖一个基准，Claude 模型只在 Claude Code 中运行。
+
+<a id="source-frozen-judges"></a>
+
+#### Frozen Judges：裁判误差随智能体版本变化
+
+**9 月 28 日，arXiv v1；9 月 29 日 v2。** [论文](https://arxiv.org/abs/2609.34198v2)
+
+固定的 LLM 裁判在比较智能体新旧版本时，可能出现随版本变化的误差。在 SWE-bench Verified 上，有几组版本对，仅依据裁判分数得到的置信区间显示新版本更好，但实际执行测试无法证实这一点，尽管裁判排名与参考结果相关性较高；较强智能体的失败补丁也更容易被判为通过。作者建议用裁判筛选需要比较的版本，发布决策则基于对当前输出随机抽样并加标注的审计。独立的人工补丁复核尚未完成。
+
+<a id="source-self-healing-harness"></a>
+
+#### Self-Healing Harness：只在既有成功保持时保留规则
+
+**9 月 21 日，arXiv v1。** [论文](https://arxiv.org/abs/2609.24130v1)
+
+智能体编写候选规则，由外部运行时决定哪些规则可以保留：只有在修复触发它的失败、且不使此前成功的受保护案例退化时，规则才会保留；另有一个守卫重新测试累积的规则集合。在因回放而被否决的 383 个提议中，211 个修复了触发失败，却破坏了一个受保护案例。研究没有与“不经门控直接接受同一批规则”的设置比较，且每轮最多回放两个受保护案例，因此 211 是检测到的冲突，不是总发生率。
+
+<a id="source-overclaiming-transcripts"></a>
+
+#### 过度声称：报告了执行记录中没有的工作
+
+**9 月 17 日，arXiv v1；9 月 22 日 v3。** [论文](https://arxiv.org/abs/2609.20812v3)
+
+该研究把“过度声称”定义为：最终报告声称完成了某项工作，但智能体自己的执行记录显示并未完成，例如声称读过一个从未打开的文件。文件覆盖率由执行记录测得，报告类别由 LLM 裁判判定。在生产 CLI 中运行的五个审查场景里，约三分之二的运行没有读完要求的文件，其中多数不完整运行要么声称已完整审查，要么没有说明遗漏；要求使用子智能体提高了覆盖率，但没有提高如实报告的比例。场景是针对 Claude Opus 调整设计的。
+
+<a id="source-terminal-bench-hardness"></a>
+
+#### Terminal-Bench 难度：零通过率需要审计
+
+**9 月 20 日，arXiv v1。** [论文](https://arxiv.org/abs/2609.26826v1)
+
+论文审计冻结的 Terminal-Bench 3 生产记录中没有任何智能体通过的任务，按顺序检查参考解是否通过、基础设施失败是否占主导、是否存在绕过验证器的方法，以及可解性是否有证据支持。125 个全失败任务中，78 个仍可作为真正未解的候选；其余任务存在参考解损坏、基础设施问题、只能靠绕过通过，或可解性未得到证明。这 78 个中有 53 个只有一次参考解运行，因此该标签范围很窄，不能证明任务本身的难度。
+
+<a id="source-deltaselect-ab"></a>
+
+#### DeltaSelect：用于 A/B 比较的小型固定任务集
+
+**9 月 17 日，arXiv v1。** [论文](https://arxiv.org/abs/2609.19607v1)
+
+DeltaSelect 为开发过程中反复进行的“基线对候选”比较选择一个小型固定任务集，而不是用于模型排名。任务按单次运行结果追踪全基准结果的可靠程度排序；任务集、校准和价格在第一次比较前冻结，基线必须在被修改的那个 harness 及其确切版本中重新运行。作者指出，尚未在同等成本下与随机选题比较，并且在小任务集上反复调优可能对其过拟合。
+
+<a id="source-claude-build-eval-hillclimb"></a>
+
+#### Claude API skill：先构建评测，再逐个保留或回滚补丁
+
+**9 月 28 日，官方文章。** [文章](https://claude.dev/blog/automating-eval-design-and-hillclimbing/)
+
+`/claude-api build-eval` 在代码库中构建评测，并检查评分器一致性以及超时、截断等基础设施故障。`/claude-api hillclimb` 把样例分为训练集和保留测试集，并先检查评测噪声是否小于值得采纳的最小改进。每轮只提出一个补丁：如果训练集分数上升而保留集持平，或任一方出现回退，就回滚该补丁；分数连续两三轮停滞时，循环按原因整理剩余的训练集失败，只把合理的失败留到后续各轮；最终增益落在噪声范围内时，建议不合并。文中的例子来自 Anthropic 自身，尚无独立复现。
+
+<a id="source-skill-revision-study"></a>
+
+#### Agent Skill Evolution：SKILL.md 修订改变了什么
+
+**10 月 4 日，arXiv v1。** [论文](https://arxiv.org/abs/2610.04832v1)
+
+该研究比较 2,608 个 SKILL.md 文件的首个与最终版本。作者报告，加入可自动检查的规则后，四个智能体执行要求动作的 episode 比例平均提高 0.23（以 0 到 1 计）；按需加载技能正文时，约保留一半的提升。
+
+<a id="source-langsmith-engine-fix-validation"></a>
+
+#### LangSmith Engine v2：审查前先复现失败
+
+**9 月 24 日，厂商文章；修复验证处于 private beta。** [文章](https://www.langchain.com/blog/langsmith-engine-v2-redteam)
+
+Engine 先在 LangSmith Deployment 中复现失败，再用同一批输入测试修复，然后才交给人工审核。文章只描述了在出错输入上的检查，没有描述对此前成功案例的检查。
 
 <a id="refresh-2026-09-15"></a>
 
@@ -144,7 +478,7 @@ Claude 可以运行调用工具的 Python 程序，暂停以等待客户端结�
 
 **9 月 8 日主线提交 2cbbf0c9。** [主线修改](https://github.com/openai/codex/commit/2cbbf0c9b542a36a1c3284b5e804917635b6f666)
 
-Codex 的9月8日主线代码增加独立的 memory v2 存储及可选双版本写入，由所选版本提供上下文。v2 在记忆提取的输入预算内，优先保留用户消息及其对智能体提问的回答，再形成任务摘要。其提示要求将特定任务的纠正保留在该任务范围内，并在整合时处理明确的纠正或删除便笺。[稳定版 0.154.0 的记忆配置](https://github.com/openai/codex/blob/6b9826e3aa83b1a5947db50f4332cb9c65f1b340/codex-rs/config/src/types.rs#L289)尚无 v2 选择开关。
+Codex 的9月8日主线代码增加独立的 memory v2 存储及可选双版本写入，由所选版本提供上下文。v2 在记忆提取的输入预算内，优先保留用户消息及其对智能体提问的回答，再形成任务摘要。其提示要求将特定任务的纠正保留在该任务范围内，并在整合时处理明确的纠正或删除便笺。自[稳定版 0.155.0](https://github.com/openai/codex/releases/tag/rust-v0.155.0)（9 月 17 日）起，[记忆配置](https://github.com/openai/codex/blob/rust-v0.155.0/codex-rs/config/src/types.rs)接受 `version` 和 `dual_write`；到 0.160.0 默认仍为 v1；截至 2026 年 10 月 6 日，配置参考未列出这两个键。
 
 <a id="source-claude-tag-recall-scope"></a>
 

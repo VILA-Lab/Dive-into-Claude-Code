@@ -6,7 +6,7 @@
 
 每个生产级编码智能体都要回答同样的几个设计问题。Claude Code 给出的是其中一套答案。本指南介绍这些选择如何组合，以及你需要什么证据来判断它们是否适合自己的系统。
 
-**阅读范围：** 本文的 Claude Code 架构示例以本仓库分析的 v2.1.88 源码快照为准，后续产品变化和跨系统对照会单独标明。来源核验截至 2026 年 9 月 15 日；证据及限制见[架构分析](architecture_zh.md)和[来源说明](agent-design-space-source-notes_zh.md)。
+**阅读范围：** 本文的 Claude Code 架构示例以本仓库分析的 v2.1.88 源码快照为准，后续产品变化和跨系统对照会单独标明。来源核验截至 2026 年 10 月 6 日；证据及限制见[架构分析](architecture_zh.md)和[来源说明](agent-design-space-source-notes_zh.md)。
 
 ---
 
@@ -94,9 +94,13 @@
 
 对于可复用经验，需要规定哪些内容值得保存、何时重新核验，以及纠正如何影响后续检索。Codex 的[整合指令](https://github.com/openai/codex/blob/3d2ee51ca2d5db578f328aa75e20aa22c0197c9a/codex-rs/memories/write/templates/memories/consolidation.md#L157)要求模型删除仅由已移除输入支持的指导，同时保留仍有来源支持的内容。这是一套需要验证的更新协议，不能保证每条过时记忆都会被正确清除。必须遵守的规则应保存在明确的策略或指令文件中。
 
-Codex 9 月 8 日的[主线更新](https://github.com/openai/codex/commit/2cbbf0c9b542a36a1c3284b5e804917635b6f666)增加记忆 v2，读取路径使用选定版本。[稳定版 0.154.0 的记忆配置](https://github.com/openai/codex/blob/6b9826e3aa83b1a5947db50f4332cb9c65f1b340/codex-rs/config/src/types.rs#L289)没有版本选择器。
+Codex 9 月 8 日的[主线更新](https://github.com/openai/codex/commit/2cbbf0c9b542a36a1c3284b5e804917635b6f666)增加记忆 v2，读取路径使用选定版本。自[稳定版 0.155.0](https://github.com/openai/codex/releases/tag/rust-v0.155.0)（2026 年 9 月 17 日）起，[记忆配置](https://github.com/openai/codex/blob/rust-v0.155.0/codex-rs/config/src/types.rs#L294)接受 `version` 和 `dual_write`。在 0.160.0 中默认仍为 v1；截至 2026 年 10 月 6 日，[配置参考文档](https://learn.chatgpt.com/docs/config-file/config-reference)未列出这两个键。
 
 **明确记忆的使用范围和修改权限。** [v2 提取指令](https://github.com/openai/codex/blob/2cbbf0c9b542a36a1c3284b5e804917635b6f666/codex-rs/memories/write/templates/memories/stage_one_system_v2.md)要求模型区分特定任务的要求与长期偏好，并在任务范围内应用后来的纠正。Claude Tag 的[公共频道便笺](https://github.com/anthropics/claude-code/releases/tag/v2.1.268)仅供本频道召回，工作区便笺则仍然共享。[Hermes Agent v0.21.2](https://github.com/NousResearch/hermes-agent/blob/939e45c91d751fadd94dcd1b873ac3cb44846213/tools/memory_tool.py#L129) 的内置记忆工具在无人值守的后台复盘中，要求先获批准才能替换或删除记忆。
+
+**把召回的记忆当作输入，并限制谁能开启记忆。** 根据 [Claude Code 更新日志](https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md)，v2.1.284（2026 年 9 月 28 日）在 MEMORY.md 和被召回的记忆便笺送入模型之前，中和其中的不可见字符和模仿 Claude Code 自身标记的标签。自 v2.1.285（9 月 29 日）起，后台会话或由 Claude Code 自身工具启动的会话不能开启[自动记忆](https://code.claude.com/docs/en/memory)，但仍可关闭。这项清洗来自厂商的说明，并不能保证防住所有被投毒的记忆。
+
+**明确哪些指令文件生效，以及修改何时生效。** 自 Claude Code v2.1.277（2026 年 9 月 18 日）起，如果工作目录及其上级目录都没有 CLAUDE.md，项目会把 AGENTS.md 作为项目指令读取。[Project instructions 设置](https://code.claude.com/docs/en/memory)提供四种模式：优先读 CLAUDE.md，没有时读 AGENTS.md（默认）；两者都读；只读 CLAUDE.md；或只读托管指令。以这种方式读取的 AGENTS.md 不触发 InstructionsLoaded hook。[Codex 0.156.0](https://github.com/openai/codex/releases/tag/rust-v0.156.0)（9 月 22 日）在每次模型请求前重新加载全局指令，但仓库指令只在环境或信任级别变化时重新发现；新的子 agent 继承父 agent 已应用的指令快照。
 
 **可以问自己的问题：**
 
@@ -130,6 +134,8 @@ Codex 9 月 8 日的[主线更新](https://github.com/openai/codex/commit/2cbbf0
 
 **将命令授权绑定到已审阅的输入。** 在 [Claude Code v2.1.271](https://code.claude.com/docs/en/plugins-reference#plugin-install) 中，安装或更新插件可能需要用户批准市场声明的命令。命令显示但未执行时，`--json` 结果会包含该命令及其摘要值。用户审阅命令后，在自己的终端中传入 `--accept-command <sha256>`。同意绑定到该命令、插件和市场目录，任一项变化都会使其失效。
 
+**明确进程内扩展与各项权限检查的先后顺序。** Claude Code 的 [mods](https://code.claude.com/docs/en/plugins/mods/overview) 首次列于 v2.1.287 更新日志（2026 年 10 月 1 日），是在 Claude Code 进程内运行、不受沙箱限制的插件函数，可以在权限提示出现前批准工具调用。在存在托管设置或使用 Team、Enterprise 登录的机器上，内置守卫（`sec-default`）会先加载：deny 规则（除非管理员设置了 `allowModsToOverrideDenyRules`）和托管 `PreToolUse` hook 仍然优先；守卫读不到托管设置时会拒绝加载用户的 mod。用户的 mod 仍可批准 `ask` 规则本应提示的调用；在 auto mode 下，这类调用不经过分类器。[管理员指南](https://code.claude.com/docs/en/plugins/mods/admin)列出了这些规则；在赋予扩展批准权之前，应先确定它相对每项检查的位置。
+
 **可以问自己的问题：**
 
 - 智能体会暴露多少工具，它们的 schema 何时进入上下文？
@@ -157,6 +163,8 @@ Codex 9 月 8 日的[主线更新](https://github.com/openai/codex/commit/2cbbf0
 **明确谁持有共享会话状态。** 在 [Agent Host Protocol](https://code.visualstudio.com/blogs/2026/08/26/agent-host-architecture) 中，宿主持有会话，并向多个客户端发送快照和有序更新。每个 harness 保留自己的 agent 循环、上下文管理和工具。因此，共同的会话接口仍需明确客户端操作在何时生效。
 
 **明确消息何时生效。** [VS Code 1.137](https://code.visualstudio.com/updates/v1_137#_agent-queued-messages) 会将 agent 发给忙碌 chat 的消息排队，当前回合成功结束后再按发送顺序开始处理排队消息。通过其 [Agent Host 工具](https://code.visualstudio.com/docs/agents/run/sessions/manage-sessions#_orchestrate-sessions-from-agent-host-sessions) 向另一会话发送消息需要用户确认。既要规定发送权限，也要规定交付时机。
+
+**说明每个停止操作结束的是什么。** Claude Code 在 2026 年 9 月 17 日至 10 月 5 日的发布（v2.1.275 至 v2.1.290）中，把停止一个回合与停止后台工作分开。自 v2.1.281 起，send-now 键（ctrl+enter，在 Claude 仍在工作时发送排队消息）把正在运行的工具移到后台，而不取消当前回合；在 VS Code 扩展中，Stop 和 Escape 只结束当前回合，后台 agent 继续运行，可在 agent 地图中逐个停止（v2.1.286）。v2.1.285 为后台 shell 命令加入时限；自 v2.1.288 起，该时限只适用于无人值守的会话，例如 `-p`、Agent SDK、CI 和云端会话（[更新日志](https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md)）。每个停止操作都应说明它结束的是当前回合、某一项后台任务，还是会话中的全部工作，以及正在运行的工具会怎样处理。
 
 **明确 worker 能否质疑任务简报。** Cognition 在 [Fusion 设计说明](https://cognition.com/blog/local-fusion)中介绍了按模型组合调整简报细度、worker 质疑指令的空间，以及探索分工的做法。应把这些选择纳入委派协议，再用自己的模型和任务进行检验。
 
@@ -186,6 +194,8 @@ Codex 9 月 8 日的[主线更新](https://github.com/openai/codex/commit/2cbbf0
 例如，Temporal 的 Deep Agents 集成在[发布时标为 pre-release](https://temporal.io/blog/durable-digest-august-2026)，将可重放的 Workflow 状态与 Activity 中的模型调用、外部 I/O 分开。[集成文档](https://docs.temporal.io/develop/python/integrations/deepagents)要求按规定包装会访问外部资源的工具和后端；持久执行依赖这些边界得到正确实现。
 
 **区分重试与新工作。** [Resume Means Resume v3](https://arxiv.org/html/2608.03836v3#S3)区分普通恢复与有意创建分支，并检查一次批准是否已经被使用。外部效果可能已完成、但结果尚未记录时，应保留操作标识。还要明确暂停时哪些工作仍在进行：[Temporal 处于 pre-release 的暂停功能](https://docs.temporal.io/encyclopedia/workflow/workflow-pause)停止新派发，但正在运行的 Activity 仍可完成。
+
+**把操作标识写进工具契约。** [Where Does Exactly-Once Live?](https://arxiv.org/abs/2609.29095v1)（arXiv，2026 年 9 月 24 日）在工具边界注入故障，例如在 agent 停止等待之后才提交的写入，或被投递两次的请求。作者（仅一人）在合成基准上报告：被要求恰好执行一次的前沿模型，在确认丢失时几乎从不重复写入，但对仍在途或被投递两次的请求经常重复执行；为每次写入提供幂等键后，重复率从 28% 降到 4%。图运行时同样需要注意：自 [Google ADK 2.9.0](https://github.com/google/adk-python/releases/tag/v2.9.0)（9 月 10 日）起，失败的工作流节点会在恢复时重新运行，因此发布说明要求节点体保持幂等；一个执行了副作用后失败的节点，每次恢复都会再次执行该副作用。
 
 **为计划和活跃运行分别设置控制。** [VS Code Automations](https://code.visualstudio.com/docs/agents/run/automations) 处于 Preview。禁用计划会阻止后续计划运行，但不会停止当前运行；停止该会话是另一项操作。计划执行还要求机器保持唤醒：Agent Host 类型的自动化需要宿主进程运行，其他类型需要 VS Code 窗口运行。
 
@@ -223,7 +233,11 @@ Codex 9 月 8 日的[主线更新](https://github.com/openai/codex/commit/2cbbf0
 
 Mastra Factory 当前的[看板规则](https://factory.mastra.ai/configure/boards-and-rules)分别定义允许的阶段转移、审批策略，以及进入和离开阶段时执行的动作。列出允许的转移不会自动移动卡片。应检查什么事件触发移动、是否需要审批、由谁审批，以及卡片离开或进入阶段时运行哪些动作。
 
+**合并之后继续检查。** PR 打开时，[Cursor Rollouts](https://cursor.com/changelog/rollouts-and-security-reviewer)（2026 年 9 月 23 日，面向 Teams 和 Enterprise）会发布一份作者可以编辑的监控计划；每次部署后，它按环境分别给出结论：健康、回归或无法判断。发现回归时，视配置而定，它可以开一个待审查的 revert PR，或把结果交给 agent 处理，但不会自行合并或回滚。保留“无法判断”这一结论，可以避免把缺少证据当作通过。
+
 [LoopArena](https://arxiv.org/html/2608.28281v1#S2)在固定 Worker 的条件下评估控制决策；它的只读 Reporter 负责整理证据，不能运行测试。[HarnessLens](https://arxiv.org/html/2608.27311v1#S4)围绕候选改动的目标行为选择检查任务，并保留独立测试集。评估技能更新时，应区分决定是否接受修改的案例与留作最终测试的案例：[SkillAdam](https://arxiv.org/html/2609.08944v1#S5.SS3)复用采样案例判断是否接受修改，并另留测试集。
+
+**接受修复时，保护此前成功的案例。** 在 [Self-Healing Harness](https://arxiv.org/abs/2609.24130v1) 研究（arXiv，2026 年 9 月 21 日）中，agent 提出规则，由外部运行时决定保留哪些：只有修复了触发它的失败、且不使此前成功的受保护案例退化的规则才会保留。作者报告，在因回放而被否决的 383 个提议中，211 个修复了触发失败，却破坏了一个受保护案例；每轮最多回放两个受保护案例，因此这些是检测到的冲突，不是总发生率。Anthropic 的 [build-eval 与 hillclimb 文章](https://claude.dev/blog/automating-eval-design-and-hillclimbing/)（9 月 28 日）描述了类似规则：先确认评测噪声小于值得采纳的最小改进，每轮只测试一个补丁；如果训练集分数上升而保留集持平，或任一分数回退，就回滚该补丁。
 
 **明确更新的对象。** 记忆、技能、运行时代码和模型权重需要不同的检查。
 
