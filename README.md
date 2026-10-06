@@ -747,6 +747,7 @@ A broader map of the agent design space surrounding Claude Code. The [Cross-Syst
 | [**QwenLM/Qwen-Agent**](https://github.com/QwenLM/Qwen-Agent) [![Star](https://img.shields.io/github/stars/QwenLM/Qwen-Agent.svg?style=social&label=Star)](https://github.com/QwenLM/Qwen-Agent) | 2023 | Alibaba Qwen's agent framework: function calling, MCP, a Docker code interpreter, and RAG; the backend behind Qwen Chat. |
 | [**TencentCloudADP/youtu-agent**](https://github.com/TencentCloudADP/youtu-agent) [![Star](https://img.shields.io/github/stars/TencentCloudADP/youtu-agent.svg?style=social&label=Star)](https://github.com/TencentCloudADP/youtu-agent) | 2025 | Tencent Cloud's agent framework, built on the openai-agents SDK; agents are defined in YAML, configs can be auto-generated, and it adds Claude Code-style skills. |
 | [**coze-dev/coze-studio**](https://github.com/coze-dev/coze-studio) [![Star](https://img.shields.io/github/stars/coze-dev/coze-studio.svg?style=social&label=Star)](https://github.com/coze-dev/coze-studio) | 2025 | ByteDance's open-source edition of Coze: a visual no-code/low-code platform for building, debugging, and deploying agents and workflows. |
+| [**5dive-ai/5dive**](https://github.com/5dive-ai/5dive) [![Star](https://img.shields.io/github/stars/5dive-ai/5dive.svg?style=social&label=Star)](https://github.com/5dive-ai/5dive) | May 2026 | Runs a team of Claude Code, Codex and other agent CLIs on one Linux server, each agent its own Linux user and systemd service, sharing a task queue. |
 
 ### Memory and Persistent Context
 
