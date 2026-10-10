@@ -621,6 +621,7 @@ Claude Code 提供了一个具体起点：模型选择动作，周围的系统�
 | [AI Guardrail Survival under Single-Cycle Agentic Self-Summarization](https://arxiv.org/abs/2608.11392) | 表明嵌入 agent 上下文里的安全规则常常在压缩后文本上还在、效力却悄悄消失：拿压缩后被削弱的规则与完好的规则相比，行为违规率上升 34 到 57 个百分点，而只看摘要文本的人根本看不出来，因为规则在不在并不等于规则还管不管用。它是论文列表里"压缩即真相流失"那条线的安全侧同伴，直指 Claude Code 的 `/compact` 这类机制。 |
 | [ColluSkill](https://arxiv.org/abs/2608.09732) 与 [SkillsMetric](https://arxiv.org/abs/2608.08468) | 8 月的两篇研究，勾勒技能扫描器的边界。ColluSkill 把恶意载荷拆分到若干各自看着无害、只在运行时才组合成有害行为的技能里，对六款有代表性的扫描器达到 96% 的平均攻击成功率，其提出的防御把这一数字压到 22.5%。SkillsMetric 在 2,266 个恶意技能上测试一套五阶段静态分析框架，发现聚合 AUC 掩盖的一个盲点：用普通 shell 命令做的毁机攻击检出率为 0%。两者一起把上面的恶意技能供应链话题推进到组合攻击与静态扫描的攻防拉锯。 |
 | [Embrace The Red — "LLM Heist: Hijacking LiteLLM for Traffic Interception, Key Theft, and Tool-Call Injection"](https://embracethered.com/blog/posts/2026/hijacking-litellm-for-fun-and-profit/) | 拿到 LiteLLM 网关代理管理员权限的攻击者，可以把它的流量改道到攻击者控制的实例、窃取后端各家的密钥，并在推理之后往响应里注入伪造的工具调用，从而绕过提示层的所有防御，因为 agent 客户端看到的是一个格式完全合法的调用。这是一记针对许多 agent 部署背后那层 LLM 网关的信任边界攻击。前提是已经拿到管理员权限，所以它更像是攻陷之后的放大器，而不是零点击突破。 |
+| [Orca AI Incident Archive](https://github.com/Continuum-AI-Corp/Orca-AI-Incident-Archive) | 一个开放的 AI 智能体安全事件数据集：每个事件一份 Markdown 记录，附公开来源链接和来源质量分级，`real_harm` 字段把已确认造成损害的事件和研究演示区分开。代码智能体相关的记录包括 Replit Agent 删除生产数据库、Claude Code 对 DataTalks.Club 生产环境执行 `terraform destroy`、Cursor 配合 Claude Opus 4.6 清空生产数据及备份，以及被投毒的 Amazon Q Developer 扩展。提供 JSON 和 CSV 导出，CC BY 4.0 许可。 |
 
 ### 评测与基准
 
