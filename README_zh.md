@@ -7,7 +7,7 @@
 </p>
 
 <p align="center">
-  <a href="https://arxiv.org/pdf/2604.14228v2"><img src="https://img.shields.io/badge/Paper-PDF-blue.svg?logo=adobeacrobatreader&logoColor=white" alt="论文"></a>
+  <a href="https://arxiv.org/pdf/2604.14228v3"><img src="https://img.shields.io/badge/Paper-PDF-blue.svg?logo=adobeacrobatreader&logoColor=white" alt="论文"></a>
   <a href="https://arxiv.org/abs/2604.14228"><img src="https://img.shields.io/badge/arXiv-2604.14228-b31b1b.svg" alt="arXiv"></a>
   <a href="./LICENSE"><img src="https://img.shields.io/badge/License-CC--BY--NC--SA--4.0-lightgrey.svg" alt="许可证"></a>
   <a href="https://github.com/VILA-Lab/Dive-into-Claude-Code/stargazers"><img src="https://img.shields.io/github/stars/VILA-Lab/Dive-into-Claude-Code?style=social" alt="星标数"></a>
@@ -58,7 +58,7 @@
 - **98.4% 基础设施，1.6% AI** —— 智能体循环不过是一个 while 循环；真正的工程复杂度集中在权限门控、上下文管理和恢复逻辑上。
 - **5 个价值观 → 13 条原则 → 实现** —— 每一条设计决策都能追溯回人类决策权威、安全、可靠性、能力和适应性。
 - **分析有上限，超限转为询问批准** —— 旧版 shell 解析路径拆出超过 50 个子命令时，会返回 `ask` 决策。
-- **2 个 CVE 暴露了预信任窗口** —— 扩展会在信任对话框出现**之前**就已执行。
+- **2 个 CVE 暴露了预信任窗口** —— 在早期版本中，MCP 服务器和设置文件中的环境变量会在用户接受信任对话框**之前**就已生效。
 - **横跨各层的 harness 难以被重新实现** —— 循环本身容易复制，但钩子、分类器、压缩和隔离机制则不然。
 
 ---
@@ -74,7 +74,7 @@
 
 `1,884 个文件` · `约 512K 行` · `v2.1.88` · `7 个安全层` · `5 个压缩阶段` · `54 个工具` · `27 个钩子事件` · `4 个扩展机制` · `7 个权限模式`
 
-架构部分分析的是 **Claude Code v2.1.88**；设计指南和资源目录在此基础上补充了截至 **2026 年 10 月 6 日**核查的工作。顶部 PDF 链接指向 [2026 年 7 月 2 日的 arXiv v2](https://arxiv.org/abs/2604.14228v2)，[仓库中的 2026 年 4 月 PDF](./paper/Dive_into_Claude_Code.pdf)保留为历史版本。
+架构部分分析的是 **Claude Code v2.1.88**；设计指南和资源目录在此基础上补充了截至 **2026 年 10 月 6 日**核查的工作，Claude Code 与 Codex 的发布说明核查至 **2026 年 10 月 14 日**。顶部 PDF 链接指向 [2026 年 10 月 10 日的 arXiv v3](https://arxiv.org/abs/2604.14228v3)。v3 重画了分层架构图（图 3）和上下文构建图（图 6），并澄清了会话恢复和预信任窗口的行为。[arXiv v2](https://arxiv.org/abs/2604.14228v2) 和[仓库中的 2026 年 4 月 PDF](./paper/Dive_into_Claude_Code.pdf)保留为历史版本。
 
 ---
 
@@ -183,7 +183,7 @@ Claude Code 回答了每个生产级编码智能体都必须面对的**四个设
 
 **7 个权限模式**构成渐进式信任光谱：`plan` → `default` → `acceptEdits` → `auto`（ML 分类器）→ `dontAsk` → `bypassPermissions`（+ 内部 `bubble`）。
 
-**拒绝优先**：规则评估中，宽范围的拒绝规则优先于窄范围的允许规则。**7 个安全层**覆盖工具过滤、权限决策、钩子和沙箱。在 v2.1.88 中，会话绕过标志和计算机操作的应用白名单不会随会话恢复；这些临时状态与持久化的权限配置需要分别看待。
+**拒绝优先**：规则评估中，宽范围的拒绝规则优先于窄范围的允许规则。**7 个安全层**覆盖工具过滤、权限决策、钩子和沙箱。在 v2.1.88 中，会话绕过标志和计算机操作的应用白名单不写入转录稿，因此在新进程中恢复的会话不带有它们；这些临时状态与持久化的权限配置需要分别看待。
 
 > [!WARNING]
 > **分析的计算上限：** 为避免阻塞事件循环，旧版解析路径限制了逐个分析的子命令数量。该路径拆出超过 50 个子命令时会返回 `ask`，转入批准决策，而不会直接放行命令。
@@ -195,7 +195,7 @@ Claude Code 回答了每个生产级编码智能体都必须面对的**四个设
 
 **Auto 模式分类器**（`yoloClassifier.ts`）：单独发起一次 LLM 调用，使用内部/外部两套权限模板；分两个阶段，先快速过滤，再走思维链。
 
-**预信任窗口：** 两个已修复的 CVE 根因相同——钩子和 MCP 服务器会在初始化阶段、信任对话框弹出*之前*就已执行，由此形成一个绕开拒绝优先管道、天然享有特权的攻击窗口。
+**预信任窗口：** 两个已修复的 CVE 根因相同——在早期版本中，MCP 服务器连接和设置文件中的环境变量会在初始化阶段、用户接受信任对话框*之前*就已生效，由此形成一个绕开拒绝优先管道、天然享有特权的攻击窗口。在论文分析的 v2.1.88 快照中，标准交互式启动路径要求先接受信任，之后才会运行钩子、连接项目 MCP 服务器，或应用安全白名单以外的项目设置环境变量。
 
 </details>
 
@@ -277,7 +277,7 @@ Claude Code 回答了每个生产级编码智能体都必须面对的**四个设
   <img src="./assets/session_compact.png" width="75%" alt="会话持久化与上下文压缩">
 </p>
 
-会话历史保存在三个通道中：仅追加的 JSONL 转录稿、全局提示历史和子智能体侧链。在 v2.1.88 中，会话绕过标志和计算机操作的应用白名单不会从旧会话恢复。持久策略、会话模式和临时授权各有自己的有效期。
+会话历史保存在三个通道中：仅追加的 JSONL 转录稿、全局提示历史和子智能体侧链。在 v2.1.88 中，会话绕过标志和计算机操作的应用白名单不写入转录稿：用 `--resume` 启动的新进程不带有它们，而在运行中的会话内 resume 或 fork 会话时，已经给出的授权仍然有效。持久策略、会话模式和临时授权各有自己的有效期。
 
 **链式修补：** 压缩边界记录 `headUuid`/`anchorUuid`/`tailUuid`。会话加载器在读取时修补消息链；磁盘上的数据不会被就地改写。
 
@@ -355,7 +355,7 @@ Claude Code 提供了一个具体起点：模型选择动作，周围的系统�
 | 设计维度 | Claude Code (v2.1.88) [![Star](https://img.shields.io/github/stars/anthropics/claude-code.svg?style=social&label=Star)](https://github.com/anthropics/claude-code) | OpenClaw [![Star](https://img.shields.io/github/stars/openclaw/openclaw.svg?style=social&label=Star)](https://github.com/openclaw/openclaw) | Hermes-Agent [![Star](https://img.shields.io/github/stars/NousResearch/hermes-agent.svg?style=social&label=Star)](https://github.com/NousResearch/hermes-agent) |
 |:---|:---|:---|:---|
 | **系统范围与部署** | 面向编程的单用户 CLI / SDK / IDE 接口；所有入口共用一个 `queryLoop` 异步生成器。 | 本地优先 WebSocket 网关（默认端口 18789，默认仅监听回环地址）；将约 23 个消息渠道路由至内嵌智能体运行时；提供 macOS、iOS、Android 伴侣应用。 | 三个入口：`hermes`（交互式 CLI）、`hermes-agent`（程序化运行时）、`hermes-acp`（ACP 服务器）；网关适配器将消息路由至按 LRU 缓存的 AIAgent 实例（最多 128 个，空闲超时 1 小时）；也可通过 `hermes mcp serve` 作为 MCP 服务器运行。 |
-| **信任模型与安全** | 拒绝优先的逐动作评估；7 种权限模式；基于 LLM 的自动模式分类器（`yoloClassifier` / `sideQuery`）；会话级权限状态（会话绕过标志、应用白名单状态）在恢复时不予还原。 | 单一可信操作员模型；DM 配对码、发件人白名单、网关身份验证；每个智能体有独立的工具允许/拒绝策略；通过 Docker / SSH / OpenShell 提供可选沙箱，默认关闭；`non-main` 模式可对非主会话启用沙箱；明确声明不支持对共享网关上的恶意多租户的隔离。 | 危险命令模式检测，配合会话级审批状态；CLI 交互提示与网关异步提示；辅助 LLM 智能审批可自动批准低风险命令；永久白名单持久化于 `config.yaml`；子智能体工作线程默认自动拒绝危险命令（可通过 `subagent_auto_approve` 开启批处理/定时任务的自动批准）。 |
+| **信任模型与安全** | 拒绝优先的逐动作评估；7 种权限模式；基于 LLM 的自动模式分类器（`yoloClassifier` / `sideQuery`）；会话级权限状态（会话绕过标志、应用白名单状态）不写入转录稿，因此在新进程中恢复的会话不带有这些状态。 | 单一可信操作员模型；DM 配对码、发件人白名单、网关身份验证；每个智能体有独立的工具允许/拒绝策略；通过 Docker / SSH / OpenShell 提供可选沙箱，默认关闭；`non-main` 模式可对非主会话启用沙箱；明确声明不支持对共享网关上的恶意多租户的隔离。 | 危险命令模式检测，配合会话级审批状态；CLI 交互提示与网关异步提示；辅助 LLM 智能审批可自动批准低风险命令；永久白名单持久化于 `config.yaml`；子智能体工作线程默认自动拒绝危险命令（可通过 `subagent_auto_approve` 开启批处理/定时任务的自动批准）。 |
 | **智能体运行时与工具** | 单一 `queryLoop` 异步生成器，以流式事件方式产出；环境与特性门控的工具注册表；API 调用前按条件运行压缩（Snip、Microcompact、Context Collapse、Auto-Compact），Auto-Compact 优先尝试会话记忆压缩。 | 内嵌智能体运行时位于网关 RPC 调度层内部（`agent` RPC 校验参数后立即返回，异步执行，并通过网关协议回传生命周期/流式事件）；每个会话有独立队列序列化，支持可选的全局通道。 | While 循环，含显式的每轮迭代预算和宽限调用槽；每轮检查点去重；网关 `step_callback` 钩子在每次迭代时触发；辅助模型上下文压缩对中间轮次进行摘要，同时保护头尾。 |
 | **扩展架构** | 四种扩展机制：hooks、skills、plugins 和 MCP；上下文开销取决于实际展示的内容；27 个钩子事件；10 种插件组件类型。 | 清单优先插件系统，含 12 个能力类别；中央注册表暴露工具、渠道、provider 设置、钩子、HTTP 路由、CLI 命令和服务；独立技能层支持多来源（工作区优先级最高）及 ClawHub 公共注册表；`openclaw mcp` 同时提供 MCP 服务器接口和面向其他 MCP 服务器的出站客户端注册表。 | `plugins/` 目录下内置 12 个插件（context_engine、disk-cleanup、example-dashboard、google_meet、hermes-achievements、image_gen、kanban、memory、observability、platforms、spotify、strike-freedom-cockpit）；MCP 服务器（`mcp_serve.py`）暴露 10 个工具；ACP 适配器（`acp_adapter/`）将 Hermes 暴露为 ACP 服务器。 |
 | **记忆与上下文** | 四层 CLAUDE.md 层级；API 调用前压缩（Snip、Microcompact、Context Collapse、Auto-Compact）；基于 LLM 从文件型 Markdown 记忆文件中进行选择。 | 工作区启动文件（AGENTS.md、SOUL.md、TOOLS.md、IDENTITY.md、USER.md）及条件性 BOOTSTRAP.md / HEARTBEAT.md / MEMORY.md；独立记忆系统（MEMORY.md、`memory/YYYY-MM-DD.md` 格式的每日笔记、可选 DREAMS.md）；配置 embedding provider 后启用向量+关键词混合检索；实验性 dreaming 在后台整合并将符合条件的条目提升至长期记忆；可插拔压缩 provider。 | SQLite 状态存储，含 FTS5 全文检索和 WAL 模式并发读取；sessions 通过 `parent_session_id` 链接以支持压缩触发的会话拆分；`plugins/memory/` 下提供 8 个可换记忆后端（byterover、hindsight、holographic、honcho、mem0、openviking、retaindb、supermemory）；辅助 LLM 压缩作为独立的上下文管理层。 |
@@ -437,7 +437,7 @@ Claude Code 提供了一个具体起点：模型选择动作，周围的系统�
 | [Orchestrate Teams of Claude Code Sessions](https://code.claude.com/docs/en/agent-teams) | agent team 是不同于 subagent 的另一种原语：队友各自持有独立上下文，通过 mailbox 互发消息，共享一个带文件锁的任务列表（支持依赖与自主认领）。信任边界写得很明确：队友不能代替用户批准权限提示，被拒的动作也不能转交给另一个队友来绕过。 |
 | [What's New in Claude Opus 4.8](https://platform.claude.com/docs/en/about-claude/models/whats-new-claude-4-8) | 对话中途 system 消息（保留 prompt cache）、更低的可缓存 prompt 阈值、更少 compaction 与更好的 compaction 恢复。 |
 | [What's New in Claude Sonnet 5](https://platform.claude.com/docs/en/about-claude/models/whats-new-sonnet-5) | 模型收回了两个原本属于 harness 的旋钮：手动 extended thinking 被移除（`thinking: {budget_tokens: N}` 返回 400），`temperature`/`top_p`/`top_k` 设为非默认值同样返回 400。新分词器让同样的文本多出约 30% token，可用的上下文预算因此随模型漂移。 |
-| [Claude Code CHANGELOG](https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md)、[v2.1.290](https://github.com/anthropics/claude-code/releases/tag/v2.1.290) | 发布说明。dynamic workflows 与 Opus 4.8 在 v2.1.154 落地。v2.1.178 至 v2.1.207（2026 年 6 至 7 月）：subagent 默认后台运行并带 `agent_needs_input`/`agent_completed` 钩子，且 agent 的消息永远不算用户批准；默认权限模式改名为 Manual；新增 `Tool(param:value)` 规则语法（如 `Agent(model:opus)`）；auto mode 不再读取仓库内的 `.claude/settings.local.json`；`sandbox.credentials` 阻断沙箱命令读取凭据文件与密钥环境变量。直到 v2.1.215（2026 年 7 月）：v2.1.212 为 WebSearch 调用与 subagent 派生各加每会话上限（默认均为 200，可由环境变量调整），把超过两分钟的 MCP 工具调用自动转入后台，把 `/fork` 改为开一个后台会话、其原本的会话内行为拆分为 `/subtask`，废弃 Task 工具的 `mode` 参数使 subagent 继承父会话的权限模式，并修复了 plan mode 会不经提示直接运行改动文件的 Bash 命令的问题。v2.1.214 新增 EndConversation 工具，要求带 daemon 重定向参数的 `docker` 命令必须授权，并修复了一个权限作用域缺陷：像 `Edit(src/**)` 这样的单段规则原本会自动批准对树中任意位置嵌套 `src/` 的写入，而非只限 `<cwd>/src`。v2.1.221–v2.1.224（2026 年 8 月）增加凭据文件遮蔽、跨机器 `SendMessage`/`ListAgents` 与 `claude self-hosted-runner`；跨会话入站消息须经过权限审查；同时修复 worktree、动态导入、组织策略绕过、不可见字符隐藏命令与 trailing-slash `denyRead` 绕过。凭据遮蔽还扩展到结构化提取、JWT claim 与 AWS 请求重签，沙箱违规原因会返回给模型作为恢复反馈。v2.1.225 至 v2.1.233（2026 年 8 月）把 auto mode 在 Pro、Max、Team 套餐上设为默认，把 subagent 分叉默认打开，使 `fork` 子 agent 继承父上下文与 prompt cache，用 `@name` 提及和入站接受/挂起控制让跨会话消息更完善，在较新模型上默认移除 todo 与任务追踪工具（`CLAUDE_CODE_ENABLE_TODO_TOOLS=1` 可恢复），并修复一个会泄漏 NTLM 凭据的 Windows NT 设备前缀路径校验绕过。 9 月 8–14 日的 v2.1.265–271 更新还涉及上下文和授权。默认记录稳定的提示及工具定义；压缩后向 Claude 提供当前 Git 状态。启用沙箱的 auto mode 可为 Bash/PowerShell/Monitor 设置按命令生效的 `allowed_domains`。指定的 MCP、hook 和 channel 托管配置读取失败时，仍保留相应限制。v2.1.271 的 `--accept-command` 将市场命令的批准绑定到已显示的命令、插件和市场目录。版本与具体条件见[来源说明](./docs/agent-design-space-source-notes_zh.md#refresh-2026-09-15)。2026 年 9 月 17 日至 10 月 5 日的 v2.1.275 至 v2.1.290：没有 CLAUDE.md 时读取 AGENTS.md；中和召回记忆中的不可见字符和模仿 Claude Code 自身标记的标签；项目设置不能再放宽管理员要求的沙箱；托管设置块中一个嵌套值无效时，不再忽略整个设置块；未配置权限模式的交互式会话以 auto mode 启动。send-now 键（ctrl+enter，在 Claude 仍在工作时发送排队消息）现在把正在运行的工具移到后台，而不取消当前回合；在 VS Code 中，Stop 和 Escape 只结束当前回合，后台 agent 继续运行，可在 agent 地图中逐个停止。版本与具体条件见[10 月 6 日来源说明](./docs/agent-design-space-source-notes_zh.md#refresh-2026-10-06)。 |
+| [Claude Code CHANGELOG](https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md)、[v2.1.299](https://github.com/anthropics/claude-code/releases/tag/v2.1.299) | 发布说明。dynamic workflows 与 Opus 4.8 在 v2.1.154 落地。v2.1.178 至 v2.1.207（2026 年 6 至 7 月）：subagent 默认后台运行并带 `agent_needs_input`/`agent_completed` 钩子，且 agent 的消息永远不算用户批准；默认权限模式改名为 Manual；新增 `Tool(param:value)` 规则语法（如 `Agent(model:opus)`）；auto mode 不再读取仓库内的 `.claude/settings.local.json`；`sandbox.credentials` 阻断沙箱命令读取凭据文件与密钥环境变量。直到 v2.1.215（2026 年 7 月）：v2.1.212 为 WebSearch 调用与 subagent 派生各加每会话上限（默认均为 200，可由环境变量调整），把超过两分钟的 MCP 工具调用自动转入后台，把 `/fork` 改为开一个后台会话、其原本的会话内行为拆分为 `/subtask`，废弃 Task 工具的 `mode` 参数使 subagent 继承父会话的权限模式，并修复了 plan mode 会不经提示直接运行改动文件的 Bash 命令的问题。v2.1.214 新增 EndConversation 工具，要求带 daemon 重定向参数的 `docker` 命令必须授权，并修复了一个权限作用域缺陷：像 `Edit(src/**)` 这样的单段规则原本会自动批准对树中任意位置嵌套 `src/` 的写入，而非只限 `<cwd>/src`。v2.1.221–v2.1.224（2026 年 8 月）增加凭据文件遮蔽、跨机器 `SendMessage`/`ListAgents` 与 `claude self-hosted-runner`；跨会话入站消息须经过权限审查；同时修复 worktree、动态导入、组织策略绕过、不可见字符隐藏命令与 trailing-slash `denyRead` 绕过。凭据遮蔽还扩展到结构化提取、JWT claim 与 AWS 请求重签，沙箱违规原因会返回给模型作为恢复反馈。v2.1.225 至 v2.1.233（2026 年 8 月）把 auto mode 在 Pro、Max、Team 套餐上设为默认，把 subagent 分叉默认打开，使 `fork` 子 agent 继承父上下文与 prompt cache，用 `@name` 提及和入站接受/挂起控制让跨会话消息更完善，在较新模型上默认移除 todo 与任务追踪工具（`CLAUDE_CODE_ENABLE_TODO_TOOLS=1` 可恢复），并修复一个会泄漏 NTLM 凭据的 Windows NT 设备前缀路径校验绕过。 9 月 8–14 日的 v2.1.265–271 更新还涉及上下文和授权。默认记录稳定的提示及工具定义；压缩后向 Claude 提供当前 Git 状态。启用沙箱的 auto mode 可为 Bash/PowerShell/Monitor 设置按命令生效的 `allowed_domains`。指定的 MCP、hook 和 channel 托管配置读取失败时，仍保留相应限制。v2.1.271 的 `--accept-command` 将市场命令的批准绑定到已显示的命令、插件和市场目录。版本与具体条件见[来源说明](./docs/agent-design-space-source-notes_zh.md#refresh-2026-09-15)。2026 年 9 月 17 日至 10 月 5 日的 v2.1.275 至 v2.1.290：没有 CLAUDE.md 时读取 AGENTS.md；中和召回记忆中的不可见字符和模仿 Claude Code 自身标记的标签；项目设置不能再放宽管理员要求的沙箱；托管设置块中一个嵌套值无效时，不再忽略整个设置块；未配置权限模式的交互式会话以 auto mode 启动。send-now 键（ctrl+enter，在 Claude 仍在工作时发送排队消息）现在把正在运行的工具移到后台，而不取消当前回合；在 VS Code 中，Stop 和 Escape 只结束当前回合，后台 agent 继续运行，可在 agent 地图中逐个停止。版本与具体条件见[10 月 6 日来源说明](./docs/agent-design-space-source-notes_zh.md#refresh-2026-10-06)。2026 年 10 月 6 日至 14 日的 v2.1.291 至 v2.1.299：作为防护的 hook 自身失败时阻止操作，command hook 和 HTTP hook 可设置 `onFailure: "block"`，插件 hook 收不到操作或无法返回答复时默认拒绝。plan 模式不再运行 hook 允许的写操作，`UserPromptSubmit` hook 在 skill 或斜杠命令展开之前运行，MCP 允许规则只作用于它指名的服务器。空闲压缩会在 200K token 以上的对话空闲约 54 分钟后、一小时的 prompt cache 过期之前进行压缩；子智能体可以设置自己的 `autoCompactWindow`。恢复会话时不再重跑已完成的回合，也不再把已批准的工具调用运行两次。见[10 月 14 日来源说明](./docs/agent-design-space-source-notes_zh.md#refresh-2026-10-14)。 |
 
 ### 架构分析
 
@@ -552,7 +552,7 @@ Claude Code 提供了一个具体起点：模型选择动作，周围的系统�
 | [Improved token efficiency for longer agent runs](https://cursor.com/blog/improved-token-efficiency) | Cursor | 9 月 23 日：Cursor 报告称，harness 改动使用户 token 成本降低 7%，且未降低智能体质量；文章称其借助面向用户群的 A/B 测试来调整这些改动。随着模型变强，它删去约 66% 的系统提示，按需加载不常用的内置工具，在每个请求中很少变化的部分之后设置缓存断点，并删除推动使用子智能体的指令，因为较新的模型已在训练中学会这种做法。数字由厂商报告，评测细节未公开。 |
 | [Dynamic workflows in Copilot CLI and the Copilot app](https://github.blog/changelog/2026-10-01-dynamic-workflows-in-copilot-cli-and-the-copilot-app)、[概念说明](https://docs.github.com/en/copilot/concepts/agents/dynamic-workflows) | GitHub | 10 月 1 日起在 Copilot CLI、Copilot app 和 Copilot SDK 中公开预览。workflow 是一段代码，规定步骤、何时调用 agent 以及如何使用其结果。上限包括并发 agent 数、agent 总数、活跃运行时间和近似 AI credits。达到并发上限时新 agent 会等待；其他上限会停止运行，但保留状态和已保存结果以便恢复，提高后的上限仍计入停止前的用量。恢复时可复用已完成步骤和子 agent 的已保存结果，未保存的工作可能需要重跑。workflow 的子 agent 继承会话的权限授予，因此为某个子 agent 作出的会话期授权也适用于其他子 agent。 |
 | [Harness Engineering: Leveraging Codex in an Agent-First World](https://openai.com/index/harness-engineering/) | OpenAI | 把 harness 定义为让智能体产出可靠、可维护结果所需的约束、反馈回路、文档结构与工具；文中提到，他们一款约百万行代码的 beta 版产品几乎没有一行是人工编写的。 |
-| [Codex 0.147.0](https://github.com/openai/codex/releases/tag/rust-v0.147.0) | OpenAI | 插件目录现在可以汇总本地、个人、工作区和远端来源，并新增 `--approve-for-me`、MCP 2026-07-28 的可选实现、远端压缩、对话分节，以及从 Cursor 导入技能、从 Claude 和 Cursor 导入对话。安全方面，首次进入陌生的本地项目需要显式确认，历史和回放中的 bearer token 会被遮蔽；插件策略更新失败时，网络访问默认关闭。Codex [0.157.0](https://github.com/openai/codex/releases/tag/rust-v0.157.0)（9 月 25 日）把网络限制扩展到重定向以及持续进行的 HTTP 和 WebSocket 流量，策略变更撤销访问权限时会取消已有连接。Codex [0.156.0](https://github.com/openai/codex/releases/tag/rust-v0.156.0)（9 月 22 日）在每次模型请求前重新加载全局指令，因此修改全局 AGENTS.md 会在运行中的会话里生效；仓库指令只在环境或信任级别变化时重新加载。 |
+| [Codex 0.147.0](https://github.com/openai/codex/releases/tag/rust-v0.147.0) | OpenAI | 插件目录现在可以汇总本地、个人、工作区和远端来源，并新增 `--approve-for-me`、MCP 2026-07-28 的可选实现、远端压缩、对话分节，以及从 Cursor 导入技能、从 Claude 和 Cursor 导入对话。安全方面，首次进入陌生的本地项目需要显式确认，历史和回放中的 bearer token 会被遮蔽；插件策略更新失败时，网络访问默认关闭。Codex [0.157.0](https://github.com/openai/codex/releases/tag/rust-v0.157.0)（9 月 25 日）把网络限制扩展到重定向以及持续进行的 HTTP 和 WebSocket 流量，策略变更撤销访问权限时会取消已有连接。Codex [0.156.0](https://github.com/openai/codex/releases/tag/rust-v0.156.0)（9 月 22 日）在每次模型请求前重新加载全局指令，因此修改全局 AGENTS.md 会在运行中的会话里生效；仓库指令只在环境或信任级别变化时重新加载。Codex [0.158.0](https://github.com/openai/codex/releases/tag/rust-v0.158.0) 至 [0.162.0](https://github.com/openai/codex/releases/tag/rust-v0.162.0)（9 月 28 日至 10 月 8 日）缩小了批准的范围：已批准的命令仍受显式文件系统拒绝规则约束，可写根目录下默认保护 `.aws`（0.159.0）；已批准的文件系统提权放宽写权限，但被拒绝的读取和网络限制仍然有效，后台任务保留发起它的回合的权限（0.161.0）；恢复会话时恢复已保存的权限（0.160.0）。可选启用的 Guardian 批准审查可以检索用户更早的指令和交接上下文（0.160.0），托管 Git worktree 工具只能在受信任的本地项目中使用（0.162.0）。见[10 月 14 日来源说明](./docs/agent-design-space-source-notes_zh.md#source-codex-turn-scoped-permissions)。 |
 | [Deep Agents v0.7](https://www.langchain.com/blog/deep-agents-v0-7) | LangChain | 删除基础系统提示和默认待办中间件，把内置工具描述缩短 43%，首轮基础输入从约 6K 降到 2K token；报告中的多模型评测没有显示整体得分明显下降。文章还说明了待办规划适合哪三类任务，并开放摘要阈值、搜索截断和文件分页等控制项。与上面的 Anthropic 文章相比，这项工作还给出了跨模型评测。 |
 | [Best Practices for Coding with Agents](https://cursor.com/blog/agent-best-practices) | Cursor | 将智能体 harness 拆为三部分——Instructions、Tools、Model——并按所用模型分别编排。 |
 | [Build with Google Antigravity](https://developers.googleblog.com/build-with-google-antigravity-our-new-agentic-development-platform/) | Google | 以智能体为先的平台：通过 Manager 界面异步编排多个智能体，并用 Artifacts（计划、截图、录屏）代替原始日志来做验证。 |

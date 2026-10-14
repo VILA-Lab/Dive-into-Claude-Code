@@ -4,13 +4,67 @@
 
 # 智能体系统设计空间：来源笔记
 
-更新日期：2026 年 10 月 6 日。
+更新日期：2026 年 10 月 14 日。
 
 本页说明[资源目录](../README_zh.md)和[设计指南](./build-your-own-agent_zh.md)所涉及的机制、实现选择及版本适用条件。[English version](./agent-design-space-source-notes.md)。
 
-截至 2026 年 9 月 15 日的历史来源笔记位于本节之后。
+2026 年 10 月 6 日和 9 月 15 日的来源笔记位于本节之后。
 
 <a id="用语约定"></a>
+
+<a id="refresh-2026-10-14"></a>
+
+## Claude Code 与 Codex 发布：2026 年 10 月 14 日
+
+本节覆盖 Claude Code v2.1.291 至 v2.1.299（10 月 6 日至 14 日；没有 v2.1.297 和 v2.1.298 两个版本）以及 Codex CLI rust-v0.158.0 至 rust-v0.162.1（9 月 28 日至 10 月 9 日）。release 时间使用 UTC。各条目复述所链接的发布说明，相关行为未经独立测试。
+
+<a id="source-claude-hooks-block-on-failure"></a>
+
+#### Claude Code：作为防护的 hook 自身失败时阻止操作
+
+**10 月 6 日至 14 日，v2.1.292、v2.1.294、v2.1.295 与 v2.1.299。** [v2.1.292](https://github.com/anthropics/claude-code/releases/tag/v2.1.292) · [v2.1.294](https://github.com/anthropics/claude-code/releases/tag/v2.1.294) · [v2.1.295](https://github.com/anthropics/claude-code/releases/tag/v2.1.295) · [v2.1.299](https://github.com/anthropics/claude-code/releases/tag/v2.1.299)
+
+2.1.295 为 command hook 和 HTTP hook 增加 `onFailure: "block"`：hook 无法启动、超时或以意外退出码结束时，阻止该操作，而不是放行。2.1.299 把同样的处理设为插件 hook 的默认行为：插件 hook 可以阻止的操作，如果 hook 收不到该操作或无法返回答复，就会被拒绝；已经运行的工具，其结果会被扣留。同一时期的几项修复关闭了调用未经检查就通过防护的情形：插件 hooks worker 重启期间发出的工具调用（2.1.292），以及插件 `tool.check` hook 对需要用户本人回答的工具（例如提问或计划批准）答复 allow 后直接运行的情形（2.1.292）。2.1.294 修复了以指令形式书写的 `prompt` hook 和 `agent` hook（例如 "Block commands that..."）放行本应阻止的内容。因此，作为安全控制使用的 hook 需要为自身失败规定结果；由模型判断的 hook 也需要像其他策略一样经过测试。
+
+<a id="source-claude-permission-order-2026-10"></a>
+
+#### Claude Code：plan 模式、提示 hook 与 MCP 规则匹配
+
+**10 月 6 日与 14 日，v2.1.292 与 v2.1.299。** [v2.1.292](https://github.com/anthropics/claude-code/releases/tag/v2.1.292) · [v2.1.299](https://github.com/anthropics/claude-code/releases/tag/v2.1.299)
+
+2.1.299 修改了三条顺序与匹配规则。plan 模式不再运行 `PreToolUse` hook 或插件 `tool.check` hook 允许的写操作。`UserPromptSubmit` hook 在 skill 或自定义斜杠命令展开之前运行，因此阻止提示的 hook 也会阻止命令中内嵌的 shell 行。MCP 允许规则只作用于它指名的服务器：`mcp__a` 不再允许名为 `a__b` 或 `a_` 的服务器，agent 的 `tools:` 列表也采用同一规则。在 auto 模式下的 Cowork 云端会话中，`PermissionRequest` hook 不能再批准 shell 命令或子智能体。此前，2.1.292 修复了 `PreToolUse` hook 的批准和 auto 模式在读取网络（UNC）路径文件时绕过权限提示的问题。这些改动让模式限制和指名资源的规则优先于扩展给出的批准。
+
+<a id="source-claude-idle-compaction"></a>
+
+#### Claude Code：空闲压缩，以及压缩会丢失什么
+
+**10 月 6 日至 14 日，v2.1.292 至 v2.1.299。** [v2.1.292](https://github.com/anthropics/claude-code/releases/tag/v2.1.292) · [v2.1.293](https://github.com/anthropics/claude-code/releases/tag/v2.1.293) · [v2.1.295](https://github.com/anthropics/claude-code/releases/tag/v2.1.295) · [v2.1.296](https://github.com/anthropics/claude-code/releases/tag/v2.1.296) · [v2.1.299](https://github.com/anthropics/claude-code/releases/tag/v2.1.299)
+
+2.1.299 在终端中加入空闲压缩：达到 200K token 以上、空闲约 54 分钟的对话，会在一小时的 prompt cache 过期之前被压缩，这样下一条消息不必重新处理整段对话。`CLAUDE_CODE_IDLE_COMPACT_MIN_TOKENS` 用来修改阈值，`"idleCompaction": false` 关闭该功能。这种触发条件取决于缓存有效期和成本，而不只是上下文大小。2.1.296 为子智能体定义增加 `autoCompactWindow`，子智能体可以比主对话更早压缩。发布说明也记录了摘要可能丢失的内容：Claude 有时把压缩前自己最后的动作当成压缩后已完成（2.1.293 修复）；重复了 `/name` 的摘要让 Claude 调用了只允许用户调用的 skill（2.1.292 修复）；压缩后需要用 `/reload-skills` 重新发送 skill 列表（2.1.299 说明）。工具描述的上下文上限也有调整：预先发送的 MCP 工具描述默认上限从 2,048 个字符提高到 4,096 个字符（2.1.296），通过 tool search 加载的描述在 16,384 个字符处截断，原为 2,048 个字符（2.1.295）。
+
+<a id="source-claude-resume-replay-2026-10"></a>
+
+#### Claude Code：恢复会话时不能重跑已完成的工作
+
+**10 月 6 日至 14 日，v2.1.292、v2.1.296 与 v2.1.299。** [v2.1.292](https://github.com/anthropics/claude-code/releases/tag/v2.1.292) · [v2.1.296](https://github.com/anthropics/claude-code/releases/tag/v2.1.296) · [v2.1.299](https://github.com/anthropics/claude-code/releases/tag/v2.1.299)
+
+2.1.296 修复了 `CLAUDE_CODE_RESUME_INTERRUPTED_TURN` 在重启后重跑已完成回合的问题，该回合是由一个 MCP 工具结果结束的。2.1.299 修复了 2.1.296 引入的回归：会话恢复期间如果到达新消息，云端会话和 headless 会话可能把已批准的工具调用运行两次。2.1.292 在通过 `claude --resume` 选择器或 `/resume` 恢复会话时恢复 plan 模式；2.1.299 让恢复的子智能体和 teammate 经过 `agent.spawn` hook，其事件现在带有 `resume`，插件可以拒绝这次恢复。因此，恢复会话需要知道哪些回合已经完成、当时适用哪种权限模式，以及重启的智能体适用哪些策略检查。
+
+<a id="source-codex-turn-scoped-permissions"></a>
+
+#### Codex：授权限于一个回合，批准后拒绝规则仍然有效
+
+**9 月 28 日至 10 月 7 日，rust-v0.158.0 至 rust-v0.161.0。** [0.158.0](https://github.com/openai/codex/releases/tag/rust-v0.158.0) · [0.159.0](https://github.com/openai/codex/releases/tag/rust-v0.159.0) · [0.160.0](https://github.com/openai/codex/releases/tag/rust-v0.160.0) · [0.161.0](https://github.com/openai/codex/releases/tag/rust-v0.161.0)
+
+Codex 0.159.0 让已批准的命令继续受显式文件系统拒绝规则约束，并在可写根目录下默认保护 `.aws` 目录。在 0.161.0 中，已批准的文件系统提权可以授予更宽的写权限，但被拒绝的读取和网络限制仍然有效；后台任务保留发起它的那个回合的权限（PR #49880，"Bind permission grants to the originating turn"）。0.160.0 在恢复会话时恢复已保存的权限，并且只在不确定的提交得到确认之后才恢复尚未发送的排队消息，以避免重复发送。0.158.0 对以提升权限运行的命令默认启用终端输入批准；新的用户输入到达时，待处理的批准审查会重试，不会因为一个询问进度的问题而被中止。在这些版本中，一次批准只为一个回合放宽一类访问权限，不会解除其他限制。
+
+<a id="source-codex-reviewer-and-agent-trees"></a>
+
+#### Codex：批准审查的上下文、智能体树与托管 worktree
+
+**9 月 28 日至 10 月 8 日，rust-v0.158.0 至 rust-v0.162.0。** [0.160.0](https://github.com/openai/codex/releases/tag/rust-v0.160.0) · [0.161.0](https://github.com/openai/codex/releases/tag/rust-v0.161.0) · [0.162.0](https://github.com/openai/codex/releases/tag/rust-v0.162.0)
+
+Guardian 是 Codex 中审查操作是否批准的子系统。0.160.0 增加了可选启用的 Guardian 能力：检索用户更早的指令，并纳入智能体交接时的上下文。0.161.0 的 PR 列表加入了 Guardian 停止子智能体时通知父智能体，以及本地智能体树的协调关闭；0.162.0 移除了只带部分历史的子智能体 fork。0.162.0 新增创建和列出托管 Git worktree 的工具，只有在启用 worktrees 功能且项目为受信任的本地项目时可用；同一版本还加入了 Code Mode 中可选启用的排序 tool search、面向自定义 Responses 兼容提供方的远端压缩，并拒绝可写的沙箱构建可执行文件。审查操作的一方现在可以自行查看用户更早的指令，停止一个智能体对周围的智能体也有了明确的影响。
 
 <a id="refresh-2026-10-06"></a>
 

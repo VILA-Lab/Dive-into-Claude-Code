@@ -217,7 +217,7 @@ Subagent transcripts use separate `.jsonl` files. The parent receives result con
 
 ### Session-scoped Grants on Resume
 
-In the v2.1.88 snapshot, the session app allowlist is not restored on resume, and the session bypass flag is not persisted. These specific rules concern temporary session state; they do not establish a general rule for restoring persistent policies or operating modes.
+In the v2.1.88 snapshot, the session app allowlist is not restored on resume, and the session bypass flag is not persisted. Neither is written to the transcript, so a new process started with `--resume` begins without them; resuming or forking inside a running session keeps the grants already given. These specific rules concern temporary session state; they do not establish a general rule for restoring persistent policies or operating modes.
 
 ### Design Trade-off
 

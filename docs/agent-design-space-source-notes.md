@@ -2,13 +2,67 @@
 
 # Agent Systems Design Space: Source Notes
 
-Updated October 6, 2026.
+Updated October 14, 2026.
 
 These notes explain the mechanisms, implementation choices, and version-specific conditions behind the [resource catalog](../README.md) and [design guide](./build-your-own-agent.md). [中文版](./agent-design-space-source-notes_zh.md).
 
-Historical source notes through September 15, 2026 follow the current section.
+Source notes from October 6 and September 15, 2026 follow the current section.
 
 <a id="writing-conventions"></a>
+
+<a id="refresh-2026-10-14"></a>
+
+## Claude Code and Codex releases: October 14, 2026
+
+This section covers Claude Code v2.1.291 to v2.1.299 (October 6 to 14; there are no v2.1.297 or v2.1.298 releases) and Codex CLI rust-v0.158.0 to rust-v0.162.1 (September 28 to October 9). Release timestamps use UTC. Each entry restates the linked release notes; the behavior has not been tested independently.
+
+<a id="source-claude-hooks-block-on-failure"></a>
+
+#### Claude Code: a guard hook that fails now blocks the action
+
+**October 6 to 14, v2.1.292, v2.1.294, v2.1.295 and v2.1.299.** [v2.1.292](https://github.com/anthropics/claude-code/releases/tag/v2.1.292) · [v2.1.294](https://github.com/anthropics/claude-code/releases/tag/v2.1.294) · [v2.1.295](https://github.com/anthropics/claude-code/releases/tag/v2.1.295) · [v2.1.299](https://github.com/anthropics/claude-code/releases/tag/v2.1.299)
+
+Version 2.1.295 adds `onFailure: "block"` for command and HTTP hooks: a hook that cannot start, times out, or exits with an unexpected code blocks the action instead of letting it through. Version 2.1.299 makes the same choice the default for plugin hooks: an action that a plugin hook could block is refused when the hook cannot receive it or cannot return its answer, and the result of a tool that already ran is withheld. Several fixes in the same window close cases where a call passed a guard without being checked: tool calls made while the plugin hooks worker restarted (2.1.292), and a plugin `tool.check` hook that answered allow for a tool that needs the user's own answer, such as a question or a plan approval (2.1.292). Version 2.1.294 fixes `prompt` and `agent` hooks written as instructions, such as "Block commands that...", allowing what they should block. A hook used as a security control therefore needs a defined result for its own failure, and a hook judged by a model needs the same testing as any other policy.
+
+<a id="source-claude-permission-order-2026-10"></a>
+
+#### Claude Code: plan mode, prompt hooks, and MCP rule matching
+
+**October 6 and 14, v2.1.292 and v2.1.299.** [v2.1.292](https://github.com/anthropics/claude-code/releases/tag/v2.1.292) · [v2.1.299](https://github.com/anthropics/claude-code/releases/tag/v2.1.299)
+
+Version 2.1.299 changes three ordering and matching rules. Plan mode no longer runs a write that a `PreToolUse` hook or a plugin `tool.check` hook allowed. `UserPromptSubmit` hooks run before a skill or custom slash command expands, so a hook that blocks the prompt also stops the command's embedded shell lines. An MCP allow rule reaches only the server it names: `mcp__a` no longer allows a server named `a__b` or `a_`, and agent `tools:` lists follow the same rule. In Cowork cloud sessions in auto mode, a `PermissionRequest` hook can no longer approve shell commands or subagents. Earlier, 2.1.292 fixed `PreToolUse` hook approvals and auto mode bypassing the permission prompt for file reads from network (UNC) paths. These changes put mode restrictions and named-resource rules ahead of an approval from an extension.
+
+<a id="source-claude-idle-compaction"></a>
+
+#### Claude Code: idle compaction and what compaction loses
+
+**October 6 to 14, v2.1.292 to v2.1.299.** [v2.1.292](https://github.com/anthropics/claude-code/releases/tag/v2.1.292) · [v2.1.293](https://github.com/anthropics/claude-code/releases/tag/v2.1.293) · [v2.1.295](https://github.com/anthropics/claude-code/releases/tag/v2.1.295) · [v2.1.296](https://github.com/anthropics/claude-code/releases/tag/v2.1.296) · [v2.1.299](https://github.com/anthropics/claude-code/releases/tag/v2.1.299)
+
+Version 2.1.299 adds idle compaction in the terminal: a conversation of 200K tokens or more that has been idle for about 54 minutes is compacted before its one-hour prompt cache expires, so the next message does not reprocess the whole conversation. `CLAUDE_CODE_IDLE_COMPACT_MIN_TOKENS` changes the threshold, and `"idleCompaction": false` turns the feature off. This trigger depends on cache lifetime and cost, not only on context size. Version 2.1.296 adds `autoCompactWindow` to subagent definitions, so a subagent can compact earlier than the main conversation. The release notes also record what a summary can lose: Claude sometimes treated its own last actions before a compaction as done after it (fixed in 2.1.293); a summary that repeated `/name` let Claude invoke a skill reserved for the user (fixed in 2.1.292); and `/reload-skills` is the stated way to send the skill list again after compaction (2.1.299). Context limits for tool descriptions also moved: MCP tool descriptions sent up front default to 4,096 characters instead of 2,048 (2.1.296), and descriptions loaded through tool search are cut at 16,384 characters instead of 2,048 (2.1.295).
+
+<a id="source-claude-resume-replay-2026-10"></a>
+
+#### Claude Code: resume must not run finished work again
+
+**October 6 to 14, v2.1.292, v2.1.296 and v2.1.299.** [v2.1.292](https://github.com/anthropics/claude-code/releases/tag/v2.1.292) · [v2.1.296](https://github.com/anthropics/claude-code/releases/tag/v2.1.296) · [v2.1.299](https://github.com/anthropics/claude-code/releases/tag/v2.1.299)
+
+Version 2.1.296 fixes `CLAUDE_CODE_RESUME_INTERRUPTED_TURN` re-running a finished turn after a restart when an MCP tool result had ended that turn. Version 2.1.299 fixes a regression from 2.1.296 in which cloud and headless sessions could run an approved tool call twice if a new message arrived while the session resumed. Version 2.1.292 restores plan mode when a session is resumed from the `claude --resume` picker or with `/resume`, and 2.1.299 sends resumed subagents and teammates through the `agent.spawn` hook, whose event now carries `resume`, so a plugin can refuse the resume. Resume therefore needs to know which turns finished, which permission mode applied, and which policy checks apply to restarted agents.
+
+<a id="source-codex-turn-scoped-permissions"></a>
+
+#### Codex: permission grants scoped to a turn, and denials that survive approval
+
+**September 28 to October 7, rust-v0.158.0 to rust-v0.161.0.** [0.158.0](https://github.com/openai/codex/releases/tag/rust-v0.158.0) · [0.159.0](https://github.com/openai/codex/releases/tag/rust-v0.159.0) · [0.160.0](https://github.com/openai/codex/releases/tag/rust-v0.160.0) · [0.161.0](https://github.com/openai/codex/releases/tag/rust-v0.161.0)
+
+Codex 0.159.0 keeps explicit filesystem denials in force for approved commands and protects `.aws` directories by default under writable roots. In 0.161.0, an approved filesystem escalation can grant broader write access while denied reads and network restrictions stay in force, and background tasks keep the permissions of the turn that started them (PR #49880, "Bind permission grants to the originating turn"). Version 0.160.0 restores saved permissions when a session resumes, and resumes unsent queued messages only after uncertain submissions are resolved, to avoid duplicate sends. Version 0.158.0 enables terminal input approval by default for commands that run with elevated permissions, and a pending approval review now retries when new user input arrives instead of being aborted by a status question. An approval in these releases widens one kind of access for one turn; it does not remove other restrictions.
+
+<a id="source-codex-reviewer-and-agent-trees"></a>
+
+#### Codex: approval-review context, agent trees, and managed worktrees
+
+**September 28 to October 8, rust-v0.158.0 to rust-v0.162.0.** [0.160.0](https://github.com/openai/codex/releases/tag/rust-v0.160.0) · [0.161.0](https://github.com/openai/codex/releases/tag/rust-v0.161.0) · [0.162.0](https://github.com/openai/codex/releases/tag/rust-v0.162.0)
+
+Guardian is the Codex subsystem that reviews actions for approval. Version 0.160.0 adds opt-in Guardian capabilities to retrieve earlier user instructions and to include context from agent handoffs. The pull-request lists in 0.161.0 add notifications to parent agents when Guardian stops a subagent and coordinated shutdown for local agent trees, and 0.162.0 removes partial-history subagent forks. Version 0.162.0 adds tools that create and list managed Git worktrees, available only from trusted local projects when the worktrees feature is enabled; it also adds opt-in ranked tool search in Code Mode, remote compaction for custom Responses-compatible providers, and rejects writable sandbox-construction executables. The reviewer of an action now has its own access to the user's earlier instructions, and stopping one agent has a defined effect on the agents around it.
 
 <a id="refresh-2026-10-06"></a>
 
