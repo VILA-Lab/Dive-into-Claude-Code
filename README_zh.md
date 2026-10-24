@@ -799,6 +799,7 @@ Claude Code 提供了一个具体起点：模型选择动作，周围的系统�
 | [**lsdefine/GenericAgent**](https://github.com/lsdefine/GenericAgent) [![Star](https://img.shields.io/github/stars/lsdefine/GenericAgent.svg?style=social&label=Star)](https://github.com/lsdefine/GenericAgent) | 2025 年 | 极简自演化自主智能体框架——9 个原子工具加约 100 行 ReAct 循环。 |
 | [**Leutenegger/book-to-skill**](https://github.com/Leutenegger/book-to-skill) [![Star](https://img.shields.io/github/stars/Leutenegger/book-to-skill.svg?style=social&label=Star)](https://github.com/Leutenegger/book-to-skill) | 2026 年 8 月 | 把一本技术书的 PDF 变成一个结构化 Agent Skill（按章分文件、心智模型、术语表与模式指南，按需加载），而不是把全文塞进上下文，号称 token 用量少 24 到 51 倍。面向 Claude Code、Copilot CLI 与 Amp。MIT。 |
 | [**xyiqq/skilldoctor**](https://github.com/xyiqq/skilldoctor) [![Star](https://img.shields.io/github/stars/xyiqq/skilldoctor.svg?style=social&label=Star)](https://github.com/xyiqq/skilldoctor) | 2026 年 8 月 | 面向 Agent Skills 的 CI 质量闸：校验 SKILL.md 规范，审计提示注入风险与硬编码密钥，并检查在 Claude Code、Cursor、Codex 与 OpenCode 间的兼容性。是最早为技能生态构建的 lint 工具之一。MIT。 |
+| [**f-o-x11/deed-page-skill**](https://github.com/f-o-x11/deed-page-skill) [![Star](https://img.shields.io/github/stars/f-o-x11/deed-page-skill.svg?style=social&label=Star)](https://github.com/f-o-x11/deed-page-skill) | 2026 年 10 月 | [deed.page](https://deed.page) 的发布技能：让 Claude Code、Codex、Cursor 等编码智能体通过一次 HTTP 调用把生成的 HTML 文件或构建目录发布为公开 URL，并用首次发布返回的所有者令牌更新或删除。同时提供远程 MCP 服务器，见[文档](https://deed.page/docs)。MIT。 |
 
 ### MCP 生态
 
